@@ -82,6 +82,10 @@ For all lists, the symbol that we are looking for will be at the start of the ne
 - Third Item
 ```
 
+### Nested Lists
+
+Nested Lists are allowed through tab characters at the start of a new line
+
 ## Code
 
 Code blocks are surrounded with \` (backticks)
@@ -125,3 +129,17 @@ Escaping characters will be done using \\
 ## HTML
 
 The compiler will not support HTML tags
+
+# Additional Syntax
+
+## Math Environments
+
+### Inline
+
+Defined with \$
+
+### Blocks
+
+Defined with double \$\$ at the start and the end of the block
+
+Only allowed at the start of a new line
