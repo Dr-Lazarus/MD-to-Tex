@@ -15,7 +15,6 @@ Cvector *cvec_init(int count, int elem_size)
         abort();
     }
 
-    cvector->data = (char *)calloc(count, elem_size);
     cvector->size = count;
     cvector->elem_size = elem_size;
 
@@ -25,6 +24,7 @@ Cvector *cvec_init(int count, int elem_size)
         capacity *= 2;
     }
     cvector->capacity = capacity;
+    cvector->data = (char *)calloc(capacity, elem_size);
 
     return cvector;
 }
