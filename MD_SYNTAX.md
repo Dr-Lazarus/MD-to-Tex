@@ -143,3 +143,15 @@ Defined with \$
 Defined with double \$\$ at the start and the end of the block
 
 Only allowed at the start of a new line
+
+## Using YAML for document level information
+
+For things like author, title and date, these will be defined as YAML
+
+```
+---
+title: Homework
+author: John Smith
+date: 2024-10-01
+---
+```
