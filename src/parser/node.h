@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 typedef struct cmark_node {
   struct cmark_node *next;
   struct cmark_node *prev;
@@ -7,7 +9,7 @@ typedef struct cmark_node {
 
   void *user_data;
   unsigned char *data;
-  /*bufsize_t len;*/
+  /* bufsize_t len; */
 
   int start_line;
   int start_column;
@@ -16,13 +18,13 @@ typedef struct cmark_node {
   uint16_t type;
   uint16_t flags;
 
-  union {
-    cmark_list list;
-    cmark_code code;
-    cmark_heading heading;
-    cmark_link linke;
-    cmark_custom custom;
-    int html_block_type;
-  } as;
+  /* union { */
+  /*   cmark_list list; */
+  /*   cmark_code code; */
+  /*   cmark_heading heading; */
+  /*   cmark_link linke; */
+  /*   cmark_custom custom; */
+  /*   int html_block_type; */
+  /* } as; */
 
 } cmark_node;
