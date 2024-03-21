@@ -16,7 +16,6 @@ typedef enum
     UNKNOWN
 } TokenType;
 
-// Structure to hold a token
 typedef struct
 {
     TokenType type;
@@ -30,7 +29,7 @@ void addToken(TokenType type, const char *content, Token *tokens, int *tokenCoun
 
 int main()
 {
-    const char *filename = "your_diagrams.md"; // Replace with the actual file name
+    const char *filename = "filename.md";
     FILE *file = fopen(filename, "r");
     if (!file)
     {
@@ -66,7 +65,7 @@ int main()
         }
         else
         {
-            // Lines outside of mermaid blocks can be handled here if needed
+            // Lines outside of mermaid blocks
         }
     }
 
@@ -87,10 +86,8 @@ int main()
 
 void processLine(char *line, TokenType currentDiagramType, Token *tokens, int *tokenCount)
 {
-    // Add detailed parsing logic based on diagram type
     if (currentDiagramType == DIAGRAM_START)
     { // Placeholder for actual type checks
-        // Check for specific elements based on diagram type
         if (strstr(line, "->>"))
         {
             addToken(MESSAGE, line, tokens, tokenCount);
