@@ -103,6 +103,10 @@ void print_tree_data(md_node* node, int indent_level) {
   }
   print_type(node, indent_level);
   print_node(node, indent_level);
+  for(int i = 0; i < indent_level * 2; i++) {
+    printf(" ");
+  }
+  printf("--------\n");
   md_node *child;
   for (child = node->first_child; child != NULL; child = child->next) {
     print_tree_data(child, indent_level + 1);
