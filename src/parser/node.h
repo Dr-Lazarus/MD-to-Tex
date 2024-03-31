@@ -39,6 +39,7 @@ typedef struct md_node {
 
   Mode user_data;
   char *data;
+  int len;
   /* bufsize_t len; */
 
   int start_line;
@@ -49,6 +50,7 @@ typedef struct md_node {
   uint16_t flags;
 
   int heading_level;
+  char *code_language;
   /* union { */
   /*   cmark_list list; */
   /*   cmark_code code; */

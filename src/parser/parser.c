@@ -30,7 +30,7 @@ char* read_source_code(const char *filename) {
 
 
 
-md_node* create_md_node(NodeType type, char * data, md_node *next, md_node *prev, md_node *parent, md_node *first_child, md_node *last_child, Mode user_data) {
+md_node* create_md_node(NodeType type, char * data, int len, md_node *next, md_node *prev, md_node *parent, md_node *first_child, md_node *last_child, Mode user_data) {
   md_node *node = (md_node *) malloc(sizeof(md_node));
   node->type = type;
   node->next = next;
@@ -39,16 +39,17 @@ md_node* create_md_node(NodeType type, char * data, md_node *next, md_node *prev
   node->first_child = first_child;
   node->last_child = last_child;
   node->data = data;
+  node->len = len;
   node->user_data = user_data;
   return node;
 }
 
 md_node* create_empty_md_node(NodeType type) {
-  return create_md_node(type, NULL, NULL, NULL, NULL, NULL, NULL, MODE_NONE);
+  return create_md_node(type, NULL, 0, NULL, NULL, NULL, NULL, NULL, MODE_NONE);
 }
 
 md_node* init_tree() {
-  return create_md_node(NODE_ROOT, "root", NULL, NULL, NULL, NULL, NULL, MODE_EMPTY);
+  return create_md_node(NODE_ROOT, "root", 4, NULL, NULL, NULL, NULL, NULL, MODE_EMPTY);
 }
 
 
@@ -68,6 +69,12 @@ void print_node(md_node* node, int indent_level) {
         printf(" ");
       }
       printf("level: %d\n", node->heading_level);
+      break;
+    case NODE_CODE:
+      for (int i = 0; i < indent_level * 2; i++) {
+        printf(" ");
+      }
+      printf("lang: %s\n", node->code_language);
       break;
     default:
       break;
@@ -90,6 +97,9 @@ void print_type(md_node* node, int indent_level) {
       break;
     case NODE_HEADING:
       printf("header node\n");
+      break;
+    case NODE_CODE:
+      printf("code node\n");
       break;
     default:
       printf("unknown node\n");
@@ -185,15 +195,55 @@ void set_header_data(md_node *node, const char *line, int line_length) {
 
   int heading_data_length = line_length - node->heading_level;
   node->data = (char *) calloc(heading_data_length, sizeof(char));
+  node->len = heading_data_length;
   line += (node->heading_level + 1);
   strncpy(node->data, line, heading_data_length);
+  printf("check null: %d\n", node->data[node->len]);
+}
+
+int is_codeblock_indicator(const char* line, int line_length) {
+  if (line_length < 3) {return 0;}
+  return strstr(line, "```") != NULL && line[0] == '`';
+}
+
+void set_code_language(md_node *current_node, const char *line, int line_length) {
+  if (line_length <= 3) {
+    current_node->code_language = NULL;
+    return;
+  }
+
+  current_node->code_language = (char *) calloc(line_length - 2, sizeof(char));
+  line += 3;
+  printf("%s\n", line);
+  strncpy(current_node->code_language, line, line_length - 2);
+}
+
+void set_code_data(md_node *node, const char *line, int line_length) {
+  if (node->data == NULL) {
+    node->data = (char *) calloc(line_length + 1, sizeof(char));
+    node->len = line_length;
+    strncpy(node->data, line, line_length + 1);
+  } else {
+    node->data = (char *) realloc(node->data, line_length + node->len + 2 * sizeof(char));
+
+    node->data[node->len] = '\n';
+    node->data[node->len + 1] = '\0';
+    strncat(node->data, line, line_length + 1);
+    // 1 more character than usual since the '\n'
+    node->len += (line_length + 1);
+  }
+  printf("code issue:\n");
+  printf("check null: %d\n", node->data[node->len]);
 }
 
 void parse_paragraph_line(md_node *current_node, const char *line, int line_length) {
   md_node *text_node = create_empty_md_node(NODE_TEXT); 
   text_node->data = (char *) calloc(line_length + 1, sizeof(char));
+  text_node->len = line_length;
   strncpy(text_node->data, line, line_length + 1);
   append_to_root(current_node, text_node);
+
+  printf("check null: %d\n", text_node->data[text_node->len]);
 }
 // the idea of this function is based on the current node, we will figure out where to put the line with respect to the rest of the tree
 void parse_line(md_node* root, const char *line, int line_length) {
@@ -217,29 +267,57 @@ void parse_line(md_node* root, const char *line, int line_length) {
 
     set_header_data(new_child_node, line, line_length);
     append_to_root(root, new_child_node);
-  } else {
-    // currently assume its just text
-    new_child_node = create_empty_md_node(NODE_PARAGRAPH);
 
-    parse_paragraph_line(new_child_node, line, line_length);
+  } else if (is_codeblock_indicator(line, line_length)) {
 
     switch (root->user_data) {
-      case MODE_STARTNEW:
+      case MODE_CODE:
+        root->user_data = MODE_STARTNEW;
+        break;
       case MODE_EMPTY:
+      case MODE_STARTNEW:
+        root->user_data = MODE_CODE;
+        new_child_node = create_empty_md_node(NODE_CODE);
+        set_code_language(new_child_node, line, line_length);
         append_to_root(root, new_child_node);
         break;
       case MODE_APPENDPARA:
-        // we take the last_child of the last_child
-        if (root->last_child->type != NODE_PARAGRAPH) {
-          printf("last child is not paragraph, cannot append");
-          abort();
-        }
-        link_children(root->last_child, new_child_node);
-        break;
+        printf("why here\n");
+        abort();
       default:
-        break;
+        printf("Unidentified mode to start code block %d\n", root->user_data);
+        abort();
     }
-    root->user_data = MODE_APPENDPARA;
+
+  } else {
+    if (root->user_data == MODE_CODE) {
+      // means we want to add to the previous one
+      set_code_data(root->last_child, line, line_length);
+    } else {
+  
+      // currently assume its just text
+      new_child_node = create_empty_md_node(NODE_PARAGRAPH);
+
+      parse_paragraph_line(new_child_node, line, line_length);
+
+      switch (root->user_data) {
+        case MODE_STARTNEW:
+        case MODE_EMPTY:
+          append_to_root(root, new_child_node);
+          break;
+        case MODE_APPENDPARA:
+          // we take the last_child of the last_child
+          if (root->last_child->type != NODE_PARAGRAPH) {
+            printf("last child is not paragraph, cannot append");
+            abort();
+          }
+          link_children(root->last_child, new_child_node);
+          break;
+        default:
+          break;
+      }
+      root->user_data = MODE_APPENDPARA;
+    }
   }
 }
 
@@ -302,6 +380,8 @@ int main(int argc, char ** argv) {
     
 
     // Now we want to figure out how does this line fit in the Tree
+    printf("parsing line: %d\n", line_number);
+    printf("line: %s\n", line);
     parse_line(root, line, line_length);
 
     // terminating stuff

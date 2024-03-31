@@ -6,3 +6,9 @@ test words
 
 more words
 same paragraph
+
+```mermaid
+test
+tickles
+foo
+```
