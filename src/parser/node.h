@@ -6,8 +6,8 @@ typedef enum {
   NODE_CODE,
   NODE_DEFINITION,
   NODE_EMPHASIS,
-  NODE_HEADING,
-  NODE_HTML,
+  NODE_HEADING, // currently ok
+  NODE_HTML,    // we will not take this
   NODE_IMAGE,
   NODE_IMAGEREFERENCE,
   NODE_INLINECODE,
@@ -15,10 +15,10 @@ typedef enum {
   NODE_LINKREFERENCE,
   NODE_LIST,
   NODE_LISTITEM,
-  NODE_PARAGRAPH,
-  NODE_ROOT,
+  NODE_PARAGRAPH, // currently ok but not the details
+  NODE_ROOT,      // currently in use for root
   NODE_STRONG,
-  NODE_TEXT,
+  NODE_TEXT, // currently the only type of text
   NODE_THEMATICBREAK
 } NodeType;
 

@@ -51,6 +51,7 @@ md_node* init_tree() {
   return create_md_node(NODE_ROOT, "root", NULL, NULL, NULL, NULL, NULL, MODE_EMPTY);
 }
 
+
 void print_node(md_node* node, int indent_level) {
   for (int i = 0; i < indent_level * 2; i++) {
     printf(" ");
@@ -109,14 +110,24 @@ void print_tree_data(md_node* node, int indent_level) {
 }
 
 void append_to_root(md_node* root, md_node* new_child) {
+  new_child->parent = root;
   if (root->last_child == NULL) {
     root->last_child = new_child;
     root->first_child = new_child;
   } else {
-    md_node* last = root->last_child;
-    last->next = new_child;
-    new_child->prev = last;
+    root->last_child->next = new_child;
+    new_child->prev = root->last_child;
     root->last_child = new_child;
+  }
+}
+
+void link_children(md_node *dest, md_node *source) {
+  dest->last_child->next = source->first_child;
+  source->first_child->prev = dest->last_child;
+  dest->last_child = source->last_child;
+
+  for (md_node *start = source->first_child; start != NULL; start = start->next) {
+    start->parent = dest;
   }
 }
 
@@ -188,10 +199,7 @@ void parse_line(md_node* root, const char *line, int line_length) {
     abort();
   }
 
-  md_node *root_last;
   md_node *new_child_node;
-  md_node *last_child;
-  md_node *new_first;
   // if its an empty line
   if (line_length == 0) {
     // we stop appending to the previous paragraph
@@ -222,14 +230,7 @@ void parse_line(md_node* root, const char *line, int line_length) {
           printf("last child is not paragraph, cannot append");
           abort();
         }
-        root_last = root->last_child;
-        // link the two lists;
-        last_child = root_last->last_child;
-        new_first = new_child_node->first_child;
-        last_child->next = new_first;
-        new_first->prev = last_child;
-        root_last->last_child = new_child_node->last_child;
-
+        link_children(root->last_child, new_child_node);
         break;
       default:
         break;
@@ -238,6 +239,29 @@ void parse_line(md_node* root, const char *line, int line_length) {
   }
 }
 
+void free_tree(md_node *root) {
+  if (root == NULL) { return; }
+
+  // if there are children
+  if (root->first_child != NULL) {
+    for (md_node *child = root->first_child; child != NULL; child = child->next) {
+      free_tree(child);
+    }
+
+    md_node *tmp;
+    md_node *head = root->first_child;
+    while (head != NULL) {
+      tmp = head;
+      head = head->next;
+
+      if (tmp->data != NULL) {
+        free(tmp->data);
+      }
+      free(tmp);
+    }
+  }
+
+}
 // possible reference for line reading
 // https://stackoverflow.com/questions/29576799/reading-an-unknown-length-line-from-stdin-in-c-with-fgets
 
@@ -300,6 +324,8 @@ int main(int argc, char ** argv) {
   ptr++;
 
   print_tree_data(root, 0);
+  free_tree(root);
+  free(root);
   free(line);
   return 0;
 }
