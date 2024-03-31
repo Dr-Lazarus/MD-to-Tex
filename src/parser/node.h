@@ -22,24 +22,33 @@ typedef enum {
   NODE_THEMATICBREAK
 } NodeType;
 
-typedef struct cmark_node {
-  struct cmark_node *next;
-  struct cmark_node *prev;
-  struct cmark_node *parent;
-  struct cmark_node *first_child;
-  struct cmark_node *last_child;
+typedef enum {
+  MODE_EMPTY,
+  MODE_APPENDPARA,
+  MODE_STARTNEW,
+  MODE_NONE,
+  MODE_CODE
+} Mode;
 
-  void *user_data;
-  unsigned char *data;
+typedef struct md_node {
+  struct md_node *next;
+  struct md_node *prev;
+  struct md_node *parent;
+  struct md_node *first_child;
+  struct md_node *last_child;
+
+  Mode user_data;
+  char *data;
   /* bufsize_t len; */
 
   int start_line;
   int start_column;
   int end_line;
   int end_column;
-  uint16_t type;
+  NodeType type;
   uint16_t flags;
 
+  int heading_level;
   /* union { */
   /*   cmark_list list; */
   /*   cmark_code code; */
@@ -49,4 +58,4 @@ typedef struct cmark_node {
   /*   int html_block_type; */
   /* } as; */
 
-} cmark_node;
+} md_node;
