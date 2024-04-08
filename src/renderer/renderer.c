@@ -10,9 +10,9 @@ void traverse_ast(md_node *root, FILE *output) {
     md_node *node = cmark_iter_get_node(iter);
     int entering = ev_type == CMARK_EVENT_ENTER;
 
-    if (md_node_get_type(node) == CMARK_NODE_CODE_BLOCK &&
+    if (md_node_get_type(node) == NODE_CODE_BLOCK &&
         strcmp(md_node_get_fence_info(node), "diagram") == 0) {
-      convert_diagram(node, output, entering);
+      // convert_diagram(node, output, entering);
     } else {
       switch (md_node_get_type(node)) {
       case NODE_PARAGRAPH:
@@ -62,7 +62,6 @@ void traverse_ast(md_node *root, FILE *output) {
       }
     }
   }
-  cmark_iter_free(iter);
 }
 
 void convert_paragraph(md_node *node, FILE *output, int entering) {
@@ -126,8 +125,6 @@ void convert_heading(md_node *node, FILE *output, int entering) {
       }
     }
   }
-  cmark_iter_free(iter);
-
   int level = md_node_get_heading_level(node);
   // Format the heading based on its level into LaTeX.
   switch (level) {
@@ -154,13 +151,13 @@ void convert_heading(md_node *node, FILE *output, int entering) {
 }
 
 void convert_list(md_node *node, FILE *output, int entering) {
-  cmark_list_type list_type = md_node_get_list_type(node);
+  ListType list_type = md_node_get_list_type(node);
   if (entering) {
-    fprintf(output, list_type == CMARK_BULLET_LIST ? "\\begin{itemize}\n"
-                                                   : "\\begin{enumerate}\n");
+    fprintf(output, list_type == LIST_BULLET ? "\\begin{itemize}\n"
+                                             : "\\begin{enumerate}\n");
   } else {
-    fprintf(output, list_type == CMARK_BULLET_LIST ? "\\end{itemize}\n"
-                                                   : "\\end{enumerate}\n");
+    fprintf(output, list_type == LIST_BULLET ? "\\end{itemize}\n"
+                                             : "\\end{enumerate}\n");
   }
 }
 

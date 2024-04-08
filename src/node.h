@@ -32,6 +32,8 @@ typedef enum {
   NODE_LINEBREAK
 } NodeType;
 
+typedef enum { LIST_BULLET, LIST_NUMBERED } ListType;
+
 typedef enum {
   MODE_EMPTY,
   MODE_APPENDPARA,
@@ -61,6 +63,9 @@ typedef struct md_node {
 
   int heading_level;
   char *code_language;
+  ListType list_type;
+  char *url;
+  char *title;
 } md_node;
 
 void print_node(md_node *node, int indent_level);
@@ -72,3 +77,11 @@ md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
                         md_node *last_child, Mode user_data);
 
 md_node *create_empty_md_node(NodeType type);
+
+NodeType md_node_get_type(md_node *node);
+char *md_node_get_fence_info(md_node *node);
+char *md_node_get_literal(md_node *node);
+int md_node_get_heading_level(md_node *node);
+ListType md_node_get_list_type(md_node *node);
+char *md_node_get_url(md_node *node);
+char *md_node_get_title(md_node *node);

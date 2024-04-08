@@ -73,3 +73,14 @@ md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
 md_node *create_empty_md_node(NodeType type) {
   return create_md_node(type, NULL, 0, NULL, NULL, NULL, NULL, NULL, MODE_NONE);
 }
+
+NodeType md_node_get_type(md_node *node) { return node->type; }
+char *md_node_get_fence_info(md_node *node) { return node->code_language; }
+char *md_node_get_literal(md_node *node) { return node->data; }
+int md_node_get_heading_level(md_node *node) { return node->heading_level; }
+
+ListType md_node_get_list_type(md_node *node) { return node->list_type; }
+
+char *md_node_get_url(md_node *node) { return node->url; }
+
+char *md_node_get_title(md_node *node) { return node->title; }

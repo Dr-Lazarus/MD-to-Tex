@@ -65,7 +65,7 @@ void parse_line(md_node *root, const char *line, int line_length) {
     case MODE_EMPTY:
     case MODE_STARTNEW:
       root->user_data = MODE_CODE;
-      new_child_node = create_empty_md_node(NODE_CODE);
+      new_child_node = create_empty_md_node(NODE_CODE_BLOCK);
       set_code_language(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
       break;
