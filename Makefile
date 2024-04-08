@@ -13,12 +13,12 @@ main.o: src/main.c
 node.o: src/node.h src/node.c
 	gcc -c src/node.c -o node.o
 
+tree.o: src/tree.h src/tree.c
+	gcc -c src/tree.c -o tree.o
+
 ## PARSER FILES
 parser.o: src/parser/parser.h src/parser/parser.c
 	gcc -c src/parser/parser.c -o parser.o
-
-tree.o: src/parser/tree.h src/parser/tree.c
-	gcc -c src/parser/tree.c -o tree.o
 
 headers.o: src/parser/features/headers.h src/parser/features/headers.c
 	gcc -c src/parser/features/headers.c -o headers.o
