@@ -16,6 +16,8 @@ graph TD;
 more words
 same paragraph
 
+test *bold* test
+
 ```mermaid
 test
 tickles

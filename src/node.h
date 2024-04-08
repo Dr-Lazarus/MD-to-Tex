@@ -40,7 +40,8 @@ typedef enum {
   MODE_APPENDPARA,
   MODE_STARTNEW,
   MODE_NONE,
-  MODE_CODE
+  MODE_CODE,
+  MODE_PROCESSED
 } Mode;
 
 typedef struct md_node {

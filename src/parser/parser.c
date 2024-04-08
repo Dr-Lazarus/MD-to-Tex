@@ -47,10 +47,18 @@ void parse_line(md_node *root, const char *line, int line_length) {
 
   md_node *new_child_node;
   // if its an empty line
+  printf("type: ");
   if (line_length == 0) {
+    printf("empty line\n");
     // we stop appending to the previous paragraph
     root->user_data = MODE_STARTNEW;
+    if (root->last_child->type == NODE_PARAGRAPH &&
+        root->last_child->user_data != MODE_PROCESSED) {
+      process_paragraph_data(root->last_child);
+      root->last_child->user_data = MODE_PROCESSED;
+    }
   } else if (is_header(line, line_length)) {
+    printf("header\n");
     // we are dealing with a header
     // we go back to root
     // we reset the mode to startnew
@@ -61,6 +69,9 @@ void parse_line(md_node *root, const char *line, int line_length) {
     append_to_root(root, new_child_node);
 
   } else if (is_codeblock_indicator(line, line_length) && strcmp(line, "```mermaid")) {
+  } else if (is_codeblock_indicator(line, line_length)) {
+    printf("code block\n");
+
     switch (root->user_data) {
     case MODE_CODE:
       root->user_data = MODE_STARTNEW;
@@ -119,20 +130,22 @@ void parse_line(md_node *root, const char *line, int line_length) {
       }
         printf("\n\n");
   } else {
+    printf("plain text\n");
     if (root->user_data == MODE_CODE) {
       // means we want to add to the previous one
       set_code_data(root->last_child, line, line_length);
     } else {
 
       // currently assume its just text
-      new_child_node = create_empty_md_node(NODE_PARAGRAPH);
-
-      parse_paragraph_line(new_child_node, line, line_length);
 
       switch (root->user_data) {
       case MODE_STARTNEW:
       case MODE_EMPTY:
+        new_child_node = create_empty_md_node(NODE_PARAGRAPH);
+        new_child_node->user_data = MODE_STARTNEW;
         append_to_root(root, new_child_node);
+        printf("sertting\n");
+        set_paragraph_data(root->last_child, line, line_length);
         break;
       case MODE_APPENDPARA:
         // we take the last_child of the last_child
@@ -140,7 +153,8 @@ void parse_line(md_node *root, const char *line, int line_length) {
           printf("last child is not paragraph, cannot append");
           abort();
         }
-        link_children(root->last_child, new_child_node);
+        printf("adding\n");
+        set_paragraph_data(root->last_child, line, line_length);
         break;
       default:
         break;
