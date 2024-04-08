@@ -1,14 +1,15 @@
 #include "renderer.h"
+#include "iterator.h"
 #include <stdio.h>
 #include <string.h>
 
 void traverse_ast(md_node *root, FILE *output) {
-  cmark_event_type ev_type;
-  cmark_iter *iter = cmark_iter_new(root);
+  iter_event_type ev_type;
+  md_iter *iter = md_iter_new(root);
 
-  while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE) {
-    md_node *node = cmark_iter_get_node(iter);
-    int entering = ev_type == CMARK_EVENT_ENTER;
+  while ((ev_type = md_iter_next(iter)) != EVENT_DONE) {
+    md_node *node = md_iter_get_node(iter);
+    int entering = ev_type == EVENT_ENTER;
 
     if (md_node_get_type(node) == NODE_CODE_BLOCK &&
         strcmp(md_node_get_fence_info(node), "diagram") == 0) {
@@ -111,13 +112,12 @@ void convert_heading(md_node *node, FILE *output, int entering) {
   char buffer[1024] = {0};
 
   // Fetch the heading text by concatenating the text of child nodes.
-  cmark_iter *iter = cmark_iter_new(node);
-  cmark_event_type ev_type;
+  md_iter *iter = md_iter_new(node);
+  iter_event_type ev_type;
   md_node *cur_node;
-  while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE) {
-    cur_node = cmark_iter_get_node(iter);
-    if (md_node_get_type(cur_node) == CMARK_NODE_TEXT &&
-        ev_type == CMARK_EVENT_ENTER) {
+  while ((ev_type = md_iter_next(iter)) != EVENT_DONE) {
+    cur_node = md_iter_get_node(iter);
+    if (md_node_get_type(cur_node) == NODE_TEXT && ev_type == EVENT_ENTER) {
       // Ensure not to overflow the buffer.
       if (strlen(buffer) + strlen(md_node_get_literal(cur_node)) <
           sizeof(buffer) - 1) {

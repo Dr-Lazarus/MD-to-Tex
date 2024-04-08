@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-#include "../node.h"
+#include "node.h"
 #endif
 
 md_node *init_tree();

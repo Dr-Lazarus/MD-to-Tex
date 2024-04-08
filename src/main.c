@@ -1,6 +1,6 @@
 #ifndef TREE_H
 #define TREE_H
-#include "parser/tree.h"
+#include "tree.h"
 #endif
 #include "parser/parser.h"
 #include "renderer/renderer.h"

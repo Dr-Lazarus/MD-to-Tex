@@ -1,6 +1,6 @@
 # CFLAGS = -Wall -Werror -ansi -pedantic
-CFLAGS =
-OFILES = main.o parser.o tree.o codeblock.o headers.o paragraph.o node.o renderer.o
+CFLAGS = -Wall -Werror
+OFILES = main.o parser.o tree.o codeblock.o headers.o paragraph.o node.o renderer.o iterator.o
 
 main: $(OFILES)
 	gcc $(OFILES) -o md_to_tex
@@ -33,6 +33,9 @@ codeblock.o: src/parser/features/codeblock.h src/parser/features/codeblock.c
 
 renderer.o: src/renderer/renderer.h src/renderer/renderer.c
 	gcc -c src/renderer/renderer.c -o renderer.o
+
+iterator.o: src/renderer/iterator.h src/renderer/iterator.c
+	gcc -c src/renderer/iterator.c -o iterator.o
 
 ## CLEAN FIlES
 clean:
