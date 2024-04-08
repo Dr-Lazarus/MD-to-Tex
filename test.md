@@ -15,3 +15,11 @@ graph TD;
 
 more words
 same paragraph
+
+```mermaid
+test
+tickles
+foo
+```
+
+![caption](image.png)

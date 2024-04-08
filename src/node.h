@@ -66,9 +66,9 @@ typedef struct md_node {
   char *code_language;
   ListType list_type;
   char *url;
+  int url_length;
   char *title;
-
-  char *mermaid_code;
+  int title_length;
 } md_node;
 
 void print_node(md_node *node, int indent_level);

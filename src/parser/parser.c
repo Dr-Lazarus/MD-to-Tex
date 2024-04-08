@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "features/codeblock.h"
 #include "features/headers.h"
+#include "features/image.h"
 #include "features/paragraph.h"
 #ifndef TREE_H
 #define TREE_H
