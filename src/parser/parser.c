@@ -1,12 +1,18 @@
+#include "features/codeblock.h"
+#include "features/headers.h"
+#include "features/paragraph.h"
+#ifndef TREE_H
+#define TREE_H
+#include "tree.h"
+#endif
+#ifndef NODE_H
+#define NODE_H
 #include "node.h"
+#endif
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// defined by the recommended line length for markdown
-#define MAX_LINE_LENGTH 121
-#define INDENTATION 2
 
 // first we need some code to read the file
 char *read_source_code(const char *filename) {
@@ -106,9 +112,9 @@ void parse_line(md_node *root, const char *line, int line_length) {
   }
 }
 
-md_node *parse_source(char *file_contents) {
+md_node *parse_source(char *file_name) {
 
-  char *file_contents = read_source_code(argv[1]);
+  char *file_contents = read_source_code(file_name);
 
   md_node *root = init_tree();
 
@@ -160,6 +166,7 @@ md_node *parse_source(char *file_contents) {
   start = ptr;
   ptr++;
 
+  free(line);
   return root;
 }
 // possible reference for line reading
@@ -174,6 +181,5 @@ int main(int argc, char **argv) {
   print_tree_data(root, 0);
   free_tree(root);
   free(root);
-  free(line);
   return 0;
 }
