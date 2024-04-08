@@ -2,6 +2,14 @@
 
 Syntax is taken primarily from [the official markdown guide](https://www.markdownguide.org/basic-syntax/)
 
+## Special Characters that need to be escaped
+
+If these characters are in paragraphs, they need to be escaped to be used.
+
+- \*
+- \_
+- \$
+
 ## Headings
 
 To create a heading, add number signs (#) in front of a word or phrase. The number of number signs you use should correspond to the heading level. For example, to create a heading level three (<h3>), use three number signs (e.g., ### My Header).
