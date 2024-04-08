@@ -18,6 +18,15 @@ same paragraph
 
 test *bold* test
 
+test *bold 3*
+
+*bold 4* test
+
+*bold 2*
+
+_bold_
+
+test _bold_ test
 ```mermaid
 test
 tickles

@@ -1,0 +1,18 @@
+\documentclass{article}
+\begin{document}
+\section{header 1}
+test words
+
+\subsection{header 2}
+more words same paragraph
+
+test \emph{bold} test
+
+
+\begin{verbatim}
+test
+tickles
+foo
+\end{verbatim}
+\begin{figure}[h]\centering\includegraphics{image.png}\caption{caption}\end{figure}
+\end{document}
