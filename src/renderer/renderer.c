@@ -182,7 +182,7 @@ void convert_code_block(md_node *node, FILE *output, int entering) {
   if (entering) {
     fprintf(output, "\n\\begin{verbatim}\n");
   } else {
-    fprintf(output, "\\end{verbatim}\n");
+    fprintf(output, "\n\\end{verbatim}\n");
   }
 }
 
