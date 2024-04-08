@@ -1,13 +1,10 @@
+#include "parser.h"
 #include "features/codeblock.h"
 #include "features/headers.h"
 #include "features/paragraph.h"
 #ifndef TREE_H
 #define TREE_H
 #include "tree.h"
-#endif
-#ifndef NODE_H
-#define NODE_H
-#include "node.h"
 #endif
 #include <regex.h>
 #include <stdio.h>
@@ -171,15 +168,3 @@ md_node *parse_source(char *file_name) {
 }
 // possible reference for line reading
 // https://stackoverflow.com/questions/29576799/reading-an-unknown-length-line-from-stdin-in-c-with-fgets
-
-int main(int argc, char **argv) {
-  if (argc != 2) {
-    printf("No file specified");
-    return 1;
-  }
-  md_node *root = parse_source(argv[1]);
-  print_tree_data(root, 0);
-  free_tree(root);
-  free(root);
-  return 0;
-}
