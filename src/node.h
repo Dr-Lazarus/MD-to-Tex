@@ -8,11 +8,12 @@
 #define INDENTATION 2
 
 typedef enum {
-  NODE_BLOCKQUOTE,
+  NODE_BLOCK_QUOTE,
   NODE_BREAK,
   NODE_CODE,
+  NODE_CODE_BLOCK,
   NODE_DEFINITION,
-  NODE_EMPHASIS,
+  NODE_EMPH,
   NODE_HEADING, // currently ok
   NODE_HTML,    // we will not take this
   NODE_IMAGE,
@@ -21,12 +22,14 @@ typedef enum {
   NODE_LINK,
   NODE_LINKREFERENCE,
   NODE_LIST,
-  NODE_LISTITEM,
+  NODE_ITEM,
   NODE_PARAGRAPH, // currently ok but not the details
   NODE_ROOT,      // currently in use for root
   NODE_STRONG,
   NODE_TEXT, // currently the only type of text
-  NODE_THEMATICBREAK
+  NODE_THEMATICBREAK,
+  NODE_SOFTBREAK,
+  NODE_LINEBREAK
 } NodeType;
 
 typedef enum {

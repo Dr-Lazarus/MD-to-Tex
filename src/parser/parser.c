@@ -4,7 +4,7 @@
 #include "features/paragraph.h"
 #ifndef TREE_H
 #define TREE_H
-#include "tree.h"
+#include "../tree.h"
 #endif
 #include <regex.h>
 #include <stdio.h>

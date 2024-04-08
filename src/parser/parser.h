@@ -1,6 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
-#include "node.h"
+#include "../node.h"
 #endif
 
 char *read_source_code(const char *filename);

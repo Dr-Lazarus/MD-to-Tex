@@ -4,74 +4,74 @@
 #include <stdlib.h>
 #include <string.h>
 
-void convert_paragraph(cmark_node *node, FILE *output, bool entering);
-void convert_text(cmark_node *node, FILE *output, bool entering);
-void convert_emph(cmark_node *node, FILE *output, bool entering);
-void convert_heading(cmark_node *node, FILE *output, bool entering);
-void convert_list(cmark_node *node, FILE *output, bool entering);
-void convert_item(cmark_node *node, FILE *output, bool entering);
-void convert_blockquote(cmark_node *node, FILE *output, bool entering);
-void convert_code_block(cmark_node *node, FILE *output, bool entering);
-void convert_code(cmark_node *node, FILE *output, bool entering);
-void convert_strong(cmark_node *node, FILE *output, bool entering);
-void convert_softbreak(cmark_node *node, FILE *output, bool entering);
-void convert_linebreak(cmark_node *node, FILE *output, bool entering);
-void convert_link(cmark_node *node, FILE *output, bool entering);
-void convert_image(cmark_node *node, FILE *output, bool entering);
+void convert_paragraph(md_node *node, FILE *output, int entering);
+void convert_text(md_node *node, FILE *output, int entering);
+void convert_emph(md_node *node, FILE *output, int entering);
+void convert_heading(md_node *node, FILE *output, int entering);
+void convert_list(md_node *node, FILE *output, int entering);
+void convert_item(md_node *node, FILE *output, int entering);
+void convert_blockquote(md_node *node, FILE *output, int entering);
+void convert_code_block(md_node *node, FILE *output, int entering);
+void convert_code(md_node *node, FILE *output, int entering);
+void convert_strong(md_node *node, FILE *output, int entering);
+void convert_softbreak(md_node *node, FILE *output, int entering);
+void convert_linebreak(md_node *node, FILE *output, int entering);
+void convert_link(md_node *node, FILE *output, int entering);
+void convert_image(md_node *node, FILE *output, int entering);
 
-void traverse_ast(cmark_node *root, FILE *output) {
+void traverse_ast(md_node *root, FILE *output) {
   cmark_event_type ev_type;
   cmark_iter *iter = cmark_iter_new(root);
 
   while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE) {
-    cmark_node *node = cmark_iter_get_node(iter);
-    bool entering = ev_type == CMARK_EVENT_ENTER;
+    md_node *node = cmark_iter_get_node(iter);
+    int entering = ev_type == CMARK_EVENT_ENTER;
 
-    if (cmark_node_get_type(node) == CMARK_NODE_CODE_BLOCK &&
-        strcmp(cmark_node_get_fence_info(node), "diagram") == 0) {
+    if (md_node_get_type(node) == md_node_CODE_BLOCK &&
+        strcmp(md_node_get_fence_info(node), "diagram") == 0) {
       convert_diagram(node, output, entering);
     } else {
-      switch (cmark_node_get_type(node)) {
-      case CMARK_NODE_PARAGRAPH:
+      switch (md_node_get_type(node)) {
+      case md_node_PARAGRAPH:
         convert_paragraph(node, output, entering);
         break;
-      case CMARK_NODE_TEXT:
+      case md_node_TEXT:
         convert_text(node, output, entering);
         break;
-      case CMARK_NODE_EMPH:
+      case md_node_EMPH:
         convert_emph(node, output, entering);
         break;
-      case CMARK_NODE_HEADING:
+      case md_node_HEADING:
         convert_heading(node, output, entering);
         break;
-      case CMARK_NODE_LIST:
+      case md_node_LIST:
         convert_list(node, output, entering);
         break;
-      case CMARK_NODE_ITEM:
+      case md_node_ITEM:
         convert_item(node, output, entering);
         break;
-      case CMARK_NODE_BLOCK_QUOTE:
+      case md_node_BLOCK_QUOTE:
         convert_blockquote(node, output, entering);
         break;
-      case CMARK_NODE_CODE_BLOCK:
+      case md_node_CODE_BLOCK:
         convert_code_block(node, output, entering);
         break;
-      case CMARK_NODE_CODE:
+      case md_node_CODE:
         convert_code(node, output, entering);
         break;
-      case CMARK_NODE_STRONG:
+      case md_node_STRONG:
         convert_strong(node, output, entering);
         break;
-      case CMARK_NODE_SOFTBREAK:
+      case md_node_SOFTBREAK:
         convert_softbreak(node, output, entering);
         break;
-      case CMARK_NODE_LINEBREAK:
+      case md_node_LINEBREAK:
         convert_linebreak(node, output, entering);
         break;
-      case CMARK_NODE_LINK:
+      case md_node_LINK:
         convert_link(node, output, entering);
         break;
-      case CMARK_NODE_IMAGE:
+      case md_node_IMAGE:
         convert_image(node, output, entering);
         break;
       default:
@@ -82,15 +82,15 @@ void traverse_ast(cmark_node *root, FILE *output) {
   cmark_iter_free(iter);
 }
 
-void convert_paragraph(cmark_node *node, FILE *output, bool entering) {
+void convert_paragraph(md_node *node, FILE *output, int entering) {
   if (!entering) {
     fprintf(output, "\n\n"); // Ensure a blank line at the end of a paragraph
   }
 }
 
-void convert_text(cmark_node *node, FILE *output, bool entering) {
+void convert_text(md_node *node, FILE *output, int entering) {
   if (entering) {
-    const char *text = cmark_node_get_literal(node);
+    const char *text = md_node_get_literal(node);
     // Assuming a simplified version of latex escaping for demonstration
     while (*text) {
       switch (*text) {
@@ -116,11 +116,11 @@ void convert_text(cmark_node *node, FILE *output, bool entering) {
   }
 }
 
-void convert_emph(cmark_node *node, FILE *output, bool entering) {
+void convert_emph(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\emph{" : "}");
 }
 
-void convert_heading(cmark_node *node, FILE *output, bool entering) {
+void convert_heading(md_node *node, FILE *output, int entering) {
   if (!entering) {
     return; // Only process the heading when entering.
   }
@@ -131,21 +131,21 @@ void convert_heading(cmark_node *node, FILE *output, bool entering) {
   // Fetch the heading text by concatenating the text of child nodes.
   cmark_iter *iter = cmark_iter_new(node);
   cmark_event_type ev_type;
-  cmark_node *cur_node;
+  md_node *cur_node;
   while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE) {
     cur_node = cmark_iter_get_node(iter);
-    if (cmark_node_get_type(cur_node) == CMARK_NODE_TEXT &&
+    if (md_node_get_type(cur_node) == md_node_TEXT &&
         ev_type == CMARK_EVENT_ENTER) {
       // Ensure not to overflow the buffer.
-      if (strlen(buffer) + strlen(cmark_node_get_literal(cur_node)) <
+      if (strlen(buffer) + strlen(md_node_get_literal(cur_node)) <
           sizeof(buffer) - 1) {
-        strcat(buffer, cmark_node_get_literal(cur_node));
+        strcat(buffer, md_node_get_literal(cur_node));
       }
     }
   }
   cmark_iter_free(iter);
 
-  int level = cmark_node_get_heading_level(node);
+  int level = md_node_get_heading_level(node);
   // Format the heading based on its level into LaTeX.
   switch (level) {
   case 1:
@@ -170,8 +170,8 @@ void convert_heading(cmark_node *node, FILE *output, bool entering) {
   }
 }
 
-void convert_list(cmark_node *node, FILE *output, bool entering) {
-  cmark_list_type list_type = cmark_node_get_list_type(node);
+void convert_list(md_node *node, FILE *output, int entering) {
+  cmark_list_type list_type = md_node_get_list_type(node);
   if (entering) {
     fprintf(output, list_type == CMARK_BULLET_LIST ? "\\begin{itemize}\n"
                                                    : "\\begin{enumerate}\n");
@@ -181,7 +181,7 @@ void convert_list(cmark_node *node, FILE *output, bool entering) {
   }
 }
 
-void convert_item(cmark_node *node, FILE *output, bool entering) {
+void convert_item(md_node *node, FILE *output, int entering) {
   if (entering) {
     // Directly start items without a leading paragraph command
     fprintf(output, "\\item ");
@@ -189,7 +189,7 @@ void convert_item(cmark_node *node, FILE *output, bool entering) {
   // No else case needed as items don't need explicit closing in LaTeX
 }
 
-void convert_blockquote(cmark_node *node, FILE *output, bool entering) {
+void convert_blockquote(md_node *node, FILE *output, int entering) {
   if (entering) {
     fprintf(output, "\\begin{quote}");
   } else {
@@ -197,7 +197,7 @@ void convert_blockquote(cmark_node *node, FILE *output, bool entering) {
   }
 }
 
-// void convert_code_block(cmark_node *node, FILE *output, bool entering) {
+// void convert_code_block(md_node *node, FILE *output, int entering) {
 //     if (entering) {
 //         fprintf(output, "\n\\begin{verbatim}\n");
 //     } else {
@@ -205,40 +205,40 @@ void convert_blockquote(cmark_node *node, FILE *output, bool entering) {
 //     }
 // }
 
-void convert_code(cmark_node *node, FILE *output, bool entering) {
+void convert_code(md_node *node, FILE *output, int entering) {
   if (entering) {
     // Fetch the code text and wrap it in \texttt
-    const char *code_text = cmark_node_get_literal(node);
+    const char *code_text = md_node_get_literal(node);
     fprintf(output, "\\texttt{%s}", code_text ? code_text : "");
   }
 }
 
-void convert_strong(cmark_node *node, FILE *output, bool entering) {
+void convert_strong(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\textbf{" : "}");
 }
 
-void convert_softbreak(cmark_node *node, FILE *output, bool entering) {
+void convert_softbreak(md_node *node, FILE *output, int entering) {
   fprintf(output, " "); // Softbreaks can be converted to spaces
 }
 
-void convert_linebreak(cmark_node *node, FILE *output, bool entering) {
+void convert_linebreak(md_node *node, FILE *output, int entering) {
   fprintf(output, "\\newline\n"); // Force a new line in LaTeX
 }
 
-void convert_link(cmark_node *node, FILE *output, bool entering) {
+void convert_link(md_node *node, FILE *output, int entering) {
   if (entering) {
-    const char *url = cmark_node_get_url(node);
+    const char *url = md_node_get_url(node);
     fprintf(output, "\\href{%s}{", url);
   } else {
     fprintf(output, "}");
   }
 }
 
-void convert_image(cmark_node *node, FILE *output, bool entering) {
+void convert_image(md_node *node, FILE *output, int entering) {
   if (entering) {
-    const char *url = cmark_node_get_url(node);
+    const char *url = md_node_get_url(node);
     const char *alt_text =
-        cmark_node_get_title(node); // Use title as alt text if available
+        md_node_get_title(node); // Use title as alt text if available
     fprintf(output,
             "\\begin{figure}[h]\\centering\\includegraphics{%s}\\caption{%s}"
             "\\end{figure}\n",
@@ -275,7 +275,7 @@ int main(int argc, char **argv) {
   input_markdown[length] = '\0';
 
   // Convert the Markdown to a document tree
-  cmark_node *document =
+  md_node *document =
       cmark_parse_document(input_markdown, length, CMARK_OPT_DEFAULT);
   free(input_markdown);
 
@@ -283,7 +283,7 @@ int main(int argc, char **argv) {
   FILE *output = fopen("output.tex", "w");
   if (!output) {
     perror("Error opening output file");
-    cmark_node_free(document);
+    md_node_free(document);
     return 1;
   }
 
@@ -297,7 +297,7 @@ int main(int argc, char **argv) {
   fprintf(output, "\\end{document}\n");
 
   // Clean up
-  cmark_node_free(document);
+  md_node_free(document);
   fclose(output);
 
   return 0;
