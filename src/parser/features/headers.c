@@ -25,10 +25,10 @@ int is_header(const char *line, int line_length) {
   int have_hex = 1;
   int counter = 0;
   for (int i = 0; i < line_length; i++) {
-    if (have_hex && line[i] == '#') {
+    if (line[i] == '#') {
       counter++;
       continue;
-    } else if (have_hex && line[i] == ' ') {
+    } else if (line[i] == ' ') {
       break;
     } else {
       have_hex = 0;
@@ -57,9 +57,10 @@ void set_header_data(md_node *node, const char *line, int line_length) {
   node->heading_level = get_header_level(line, line_length);
 
   int heading_data_length = line_length - node->heading_level;
-  node->data = (char *)calloc(heading_data_length, sizeof(char));
-  node->len = heading_data_length;
+  md_node *text_node = create_empty_md_node(NODE_TEXT);
+  text_node->data = (char *)calloc(heading_data_length, sizeof(char));
+  text_node->len = heading_data_length;
   line += (node->heading_level + 1);
-  strncpy(node->data, line, heading_data_length);
-  printf("check null: %d\n", node->data[node->len]);
+  append_to_root(node, text_node);
+  strncpy(text_node->data, line, heading_data_length);
 }

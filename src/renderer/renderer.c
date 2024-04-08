@@ -27,6 +27,7 @@ void traverse_ast(md_node *root, FILE *output) {
         break;
       case NODE_HEADING:
         convert_heading(node, output, entering);
+        md_iter_next(iter);
         break;
       case NODE_LIST:
         convert_list(node, output, entering);
