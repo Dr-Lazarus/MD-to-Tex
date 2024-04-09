@@ -29,7 +29,8 @@ typedef enum {
   NODE_TEXT, // currently the only type of text
   NODE_THEMATICBREAK,
   NODE_SOFTBREAK,
-  NODE_LINEBREAK
+  NODE_LINEBREAK,
+  NODE_MERMAID_DIAGRAM
 } NodeType;
 
 typedef enum { LIST_BULLET, LIST_NUMBERED } ListType;
@@ -66,6 +67,8 @@ typedef struct md_node {
   ListType list_type;
   char *url;
   char *title;
+
+  char *mermaid_code;
 } md_node;
 
 void print_node(md_node *node, int indent_level);
@@ -81,6 +84,7 @@ md_node *create_empty_md_node(NodeType type);
 NodeType md_node_get_type(md_node *node);
 char *md_node_get_fence_info(md_node *node);
 char *md_node_get_literal(md_node *node);
+char *md_node_get_mermaid_code(md_node *node);
 int md_node_get_heading_level(md_node *node);
 ListType md_node_get_list_type(md_node *node);
 char *md_node_get_url(md_node *node);

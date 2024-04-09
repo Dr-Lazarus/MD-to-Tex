@@ -36,3 +36,64 @@ My thirst for knowledge extends beyond the classroom, as evidenced by my partici
 
 In conclusion, my coursework projects and research experiences demonstrate my unwavering passion for science and research. Given the opportunity, I am eager to further expand my capabilities through continued exploration and involvement in research and development endeavors.
 
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+```mermaid
+graph TD;
+    E-->F;
+    E-->G;
+    E-->H;
+```
+
+```mermaid
+graph TD;
+    I-->J;
+    I-->K;
+    J-->L;
+    K-->L;
+    L-->M;
+    J-->M;
+```
+
+```mermaid
+graph TD;
+    N-->O;
+    O-->P;
+    P-->N;
+```
+
+```mermaid
+graph TD;
+    Q-->R;
+    Q-->S;
+    R-->T;
+    S-->T;
+    T-->U;
+    S-->V;
+    U-->W;
+    V-->W;
+    V-->X;
+```
+
+```mermaid
+graph TD;
+    A1-->B1;
+    B1-->C1;
+    C1-->D1;
+    D1-->E1;
+```
+
+```mermaid
+graph TD;
+    A2-->B2;
+    A2-->C2;
+    A2-->D2;
+    A2-->E2;
+    A2-->F2;
+```

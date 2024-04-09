@@ -48,6 +48,9 @@ void print_type(md_node *node, int indent_level) {
   case NODE_CODE:
     printf("code node\n");
     break;
+  case NODE_MERMAID_DIAGRAM:
+    printf("mermaid node\n");
+    break;
   default:
     printf("unknown node\n");
     break;
@@ -64,9 +67,16 @@ md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
   node->parent = parent;
   node->first_child = first_child;
   node->last_child = last_child;
-  node->data = data;
-  node->len = len;
+  // node->data = data;
+  // node->len = len;
   node->user_data = user_data;
+  if (type == NODE_MERMAID_DIAGRAM) {
+        node->mermaid_code = strdup(data);
+        node->len = strlen(data);
+    } else {
+        node->data = data;
+        node->len = len;
+    }
   return node;
 }
 
@@ -77,6 +87,7 @@ md_node *create_empty_md_node(NodeType type) {
 NodeType md_node_get_type(md_node *node) { return node->type; }
 char *md_node_get_fence_info(md_node *node) { return node->code_language; }
 char *md_node_get_literal(md_node *node) { return node->data; }
+char *md_node_get_mermaid_code(md_node *node) { return node->mermaid_code; }
 int md_node_get_heading_level(md_node *node) { return node->heading_level; }
 
 ListType md_node_get_list_type(md_node *node) { return node->list_type; }
