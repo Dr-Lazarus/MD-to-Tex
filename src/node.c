@@ -93,7 +93,7 @@ md_node *create_empty_md_node(NodeType type) {
 NodeType md_node_get_type(md_node *node) { return node->type; }
 char *md_node_get_fence_info(md_node *node) { return node->code_language; }
 char *md_node_get_literal(md_node *node) { return node->data; }
-char *md_node_get_mermaid_code(md_node *node) { return node->mermaid_code; }
+char *md_node_get_mermaid_code(md_node *node) { return node->data; }
 int md_node_get_heading_level(md_node *node) { return node->heading_level; }
 
 ListType md_node_get_list_type(md_node *node) { return node->list_type; }

@@ -48,7 +48,6 @@ void set_text_data(md_node *node, const char *text, int text_length) {
 }
 
 void process_paragraph_data(md_node *node) {
-  return;
   char *text_data = node->first_child->data;
   int text_length = node->first_child->len;
   node->first_child = NULL;

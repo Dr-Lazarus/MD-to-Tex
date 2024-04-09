@@ -6,7 +6,7 @@ test words
 
 ## Test Case 7: Wide Tree Structure
 
-```
+```mermaid
 graph TD;
     A-->B;
     A-->C;

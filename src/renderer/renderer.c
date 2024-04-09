@@ -39,7 +39,21 @@ void traverse_ast(md_node *root, FILE *output) {
       convert_blockquote(node, output, entering);
       break;
     case NODE_CODE_BLOCK:
-      convert_code_block(node, output, entering);
+      if (node->code_language != NULL &&
+          !strcmp(node->code_language, "mermaid")) {
+        ev_type = md_iter_next(iter);
+        node = md_iter_get_node(iter);
+        entering = ev_type == EVENT_ENTER;
+        printf("node type: %d\n", node->type);
+        printf("node data: %s\n", node->data);
+        printf("entering: %d\n", entering);
+        convert_mermaid_diagram(node, output, entering);
+        ev_type = md_iter_next(iter);
+        ev_type = md_iter_next(iter);
+      } else {
+
+        convert_code_block(node, output, entering);
+      }
       break;
     case NODE_CODE:
       convert_code(node, output, entering);
@@ -107,48 +121,28 @@ void convert_emph(md_node *node, FILE *output, int entering) {
 }
 
 void convert_heading(md_node *node, FILE *output, int entering) {
-  if (!entering) {
-    return; // Only process the heading when entering.
-  }
-
-  // Prepare a buffer for the heading text. Adjust size as needed.
-  char buffer[1024] = {0};
-
-  // Fetch the heading text by concatenating the text of child nodes.
-  md_iter *iter = md_iter_new(node);
-  iter_event_type ev_type;
-  md_node *cur_node;
-  while ((ev_type = md_iter_next(iter)) != EVENT_DONE) {
-    cur_node = md_iter_get_node(iter);
-    if (md_node_get_type(cur_node) == NODE_TEXT && ev_type == EVENT_ENTER) {
-      // Ensure not to overflow the buffer.
-      if (strlen(buffer) + strlen(md_node_get_literal(cur_node)) <
-          sizeof(buffer) - 1) {
-        strcat(buffer, md_node_get_literal(cur_node));
-      }
-    }
-  }
+  fprintf(output, entering ? "\\emph{" : "}");
   int level = md_node_get_heading_level(node);
   // Format the heading based on its level into LaTeX.
   switch (level) {
   case 1:
-    fprintf(output, "\\section{%s}\n", buffer);
+    fprintf(output, entering ? "\\section{" : "}\n");
     break;
   case 2:
-    fprintf(output, "\\subsection{%s}\n", buffer);
+    fprintf(output, entering ? "\\subsection{" : "}\n");
     break;
   case 3:
-    fprintf(output, "\\subsubsection{%s}\n", buffer);
+    fprintf(output, entering ? "\\subsubsection{" : "}\n");
     break;
   case 4:
-    fprintf(output, "\\paragraph{%s}\n", buffer);
+    fprintf(output, entering ? "\\paragraph{" : "}\n");
     break;
   case 5:
-    fprintf(output, "\\subparagraph{%s}\n", buffer);
+    fprintf(output, entering ? "\\subparagraph{" : "}\n");
     break;
   default:
     // Handle unexpected heading levels, if any.
-    fprintf(output, "\\paragraph{%s}\n", buffer);
+    fprintf(output, entering ? "\\paragraph{" : "}\n");
     break;
   }
 }
@@ -183,7 +177,6 @@ void convert_blockquote(md_node *node, FILE *output, int entering) {
 }
 
 void convert_code_block(md_node *node, FILE *output, int entering) {
-  printf("writing code block\n");
   if (entering) {
     fprintf(output, "\n\\begin{verbatim}\n");
   } else {
