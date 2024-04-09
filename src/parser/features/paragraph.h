@@ -6,9 +6,11 @@
 #define TREE_H
 #include "../../tree.h"
 #endif
+#ifndef UTIL_H
+#define UTIL_H
+#include "../../util/util.h"
+#endif
 
-void parse_paragraph_line(md_node *current_node, const char *line,
-                          int line_length);
 void set_paragraph_data(md_node *node, const char *line, int line_length);
 
 void process_paragraph_data(md_node *node);

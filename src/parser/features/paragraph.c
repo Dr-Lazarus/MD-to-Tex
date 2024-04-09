@@ -2,40 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-void parse_paragraph_line(md_node *current_node, const char *line,
-                          int line_length) {
-  md_node *text_node = create_empty_md_node(NODE_TEXT);
-  text_node->data = (char *)calloc(line_length + 1, sizeof(char));
-  text_node->len = line_length;
-  strncpy(text_node->data, line, line_length + 1);
-  append_to_root(current_node, text_node);
-
-  printf("check null: %d\n", text_node->data[text_node->len]);
-}
-
 void set_paragraph_data(md_node *node, const char *line, int line_length) {
-  md_node *text_node;
-  if (node->first_child == NULL) {
-    text_node = create_empty_md_node(NODE_TEXT);
-    append_to_root(node, text_node);
-  } else {
-    text_node = node->first_child;
-  }
-
-  if (text_node->data == NULL) {
-    text_node->data = (char *)calloc(line_length + 1, sizeof(char));
-    text_node->len = line_length;
-    strncpy(text_node->data, line, line_length + 1);
-  } else {
-    text_node->data = (char *)realloc(
-        text_node->data, line_length + text_node->len + 2 * sizeof(char));
-
-    text_node->data[text_node->len] = ' ';
-    text_node->data[text_node->len + 1] = '\0';
-    strncat(text_node->data, line, line_length + 1);
-    // 1 more character than usual since the '\n'
-    text_node->len += (line_length + 1);
-  }
+  add_text_data(node, line, line_length, ' ');
 }
 
 void set_text_data(md_node *node, const char *text, int text_length) {
