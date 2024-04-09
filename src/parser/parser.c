@@ -153,6 +153,8 @@ void parse_line(md_node *root, const char *line, int line_length) {
     printf("unknown type\n");
     break;
   }
+
+  root->prev_line_type = current_line_type;
 }
 
 md_node *parse_source(char *file_name) {
