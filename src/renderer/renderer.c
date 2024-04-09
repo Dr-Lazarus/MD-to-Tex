@@ -11,11 +11,7 @@ void traverse_ast(md_node *root, FILE *output) {
   while ((ev_type = md_iter_next(iter)) != EVENT_DONE) {
     md_node *node = md_iter_get_node(iter);
     int entering = ev_type == EVENT_ENTER;
-    printf("node type: %d\n", node->type);
-    printf("node data: %s\n", node->data);
-    printf("entering: %d\n", entering);
 
-    ;
     switch (md_node_get_type(node)) {
     case NODE_PARAGRAPH:
       convert_paragraph(node, output, entering);
@@ -44,9 +40,6 @@ void traverse_ast(md_node *root, FILE *output) {
         ev_type = md_iter_next(iter);
         node = md_iter_get_node(iter);
         entering = ev_type == EVENT_ENTER;
-        printf("node type: %d\n", node->type);
-        printf("node data: %s\n", node->data);
-        printf("entering: %d\n", entering);
         convert_mermaid_diagram(node, output, entering);
         ev_type = md_iter_next(iter);
         ev_type = md_iter_next(iter);

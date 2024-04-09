@@ -7,8 +7,7 @@ int is_list_item(const char *line, int line_length) {
   int value;
   // Creation of regEx
   // we are opinionated and need the space
-  value =
-      regcomp(&list_regex, "^(\\t| )*(\\*|-|\\+)(\\t| )(.*)$", REG_EXTENDED);
+  value = regcomp(&list_regex, "^(\t| )*(\\*|-|\\+)(\t| )(.*)$", REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
   }
@@ -18,7 +17,7 @@ int is_list_item(const char *line, int line_length) {
   }
 
   // check numbered list
-  value = regcomp(&list_regex, "^(\\t| )*([[:digit:]]+\\.)(\\t| )(.*)$",
+  value = regcomp(&list_regex, "^(\t| )*([[:digit:]]+\\.)(\t| )(.*)$",
                   REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
@@ -80,13 +79,50 @@ int check_punctuation(char *text, int text_length) {
 }
 
 // TODO to implement to check for consistent white space indentation
-int check_whitespace(char *text, int text_length) { return 1; }
+int check_whitespace_consistency(char *text, int text_length) {
+
+  char *new_line_char;
+  char *start;
+  char *end;
+  int indentation_level = 0;
+  char indent = '\0';
+  start = text;
+  while ((end = strstr(start, "\n")) != NULL) {
+    if (*start != ' ' && *start != '\t') {
+      start = (end + 1);
+      continue;
+    }
+    if (indent == '\0') {
+      indent = *start;
+    }
+
+    // keep progressing if it is a type of indent and its equivalent
+    while (*start == indent && (*start == ' ' || *start == '\t')) {
+      start++;
+    }
+
+    // check why we bailed on the while loop
+    // if it is either of these, we did not hit the delimiter and theres an
+    // inconsistency
+    if (*start == ' ' || *start == '\t') {
+      return 0;
+    }
+    start = (end + 1);
+  }
+
+  return 1;
+}
 
 void process_list_data(md_node *node) {
   char *text_data = node->first_child->data;
   int text_length = node->first_child->len;
   node->first_child = NULL;
   node->last_child = NULL;
+
+  if (text_data[0] == ' ' || text_data[0] == '\t') {
+    printf("List cannot start with an empty space\n");
+    abort();
+  }
 
   // figure out the type of list
   if (text_data[0] == '-' || text_data[0] == '+' || text_data[0] == '*') {
@@ -99,11 +135,11 @@ void process_list_data(md_node *node) {
   // check that the punctuation is all the same
   // Only checks for unnumbered list
   if (!check_punctuation(text_data, text_length)) {
-    printf("Inconsistent punctuation in unnumbered list");
+    printf("Inconsistent punctuation in unnumbered list\n");
     abort();
   }
-  if (!check_whitespace(text_data, text_length)) {
-    printf("Inconsistent indentation");
+  if (!check_whitespace_consistency(text_data, text_length)) {
+    printf("Inconsistent indentation\n");
     abort();
   }
   // we cannot handle nested currently

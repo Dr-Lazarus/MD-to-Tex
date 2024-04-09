@@ -157,6 +157,10 @@ void parse_line(md_node *root, const char *line, int line_length) {
     break;
 
   case LINE_TEXT:
+    if (root->last_child != NULL && root->last_child->type != NODE_PARAGRAPH &&
+        root->last_child->type != NODE_CODE_BLOCK) {
+      process_last_node(root->last_child);
+    }
     if (root->last_child == NULL ||
         root->last_child->user_data == MODE_PROCESSED) {
       new_child_node = create_empty_md_node(NODE_PARAGRAPH);
