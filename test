@@ -34,6 +34,11 @@ test *bold 3*
 - 
 - one two
 
+1. test
+2. two
+3. three
+4. I can't count no more
+
 test _bold_ [link](e.com) tet
 ```mermaid
 test

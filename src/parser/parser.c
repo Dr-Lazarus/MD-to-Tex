@@ -49,6 +49,7 @@ LineType get_line_type(const char *line, int line_length) {
   } else if (is_image_link(line, line_length)) {
     return LINE_IMAGE;
   } else if (is_list_item(line, line_length)) {
+    printf("is list\n");
     return LINE_LISTITEM;
   } else {
     return LINE_TEXT;

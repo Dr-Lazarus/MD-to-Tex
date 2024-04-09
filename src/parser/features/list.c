@@ -18,7 +18,8 @@ int is_list_item(const char *line, int line_length) {
   }
 
   // check numbered list
-  value = regcomp(&list_regex, "^(\\t| )*(\\d.)(\\t| )(.*)$", REG_EXTENDED);
+  value = regcomp(&list_regex, "^(\\t| )*([[:digit:]]+\\.)(\\t| )(.*)$",
+                  REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
   }
