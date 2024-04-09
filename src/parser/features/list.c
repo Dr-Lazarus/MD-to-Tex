@@ -87,6 +87,13 @@ void process_list_data(md_node *node) {
   node->first_child = NULL;
   node->last_child = NULL;
 
+  // figure out the type of list
+  if (text_data[0] == '-' || text_data[0] == '+' || text_data[0] == '*') {
+    node->list_type = LIST_BULLET;
+  } else {
+    node->list_type = LIST_NUMBERED;
+  }
+
   // now we construct the list
   // check that the punctuation is all the same
   // Only checks for unnumbered list
