@@ -219,11 +219,10 @@ void convert_image(md_node *node, FILE *output, int entering) {
   if (entering) {
     const char *url = md_node_get_url(node);
     const char *alt_text =
-        md_node_get_title(node); // Use title as alt text if available
+        md_node_get_title(node);
     fprintf(output,
             "\\begin{figure}[h]\\centering\\includegraphics{%s}\\caption{%s}"
             "\\end{figure}\n",
             url, alt_text ? alt_text : "");
   }
-  // No need to handle exiting since images are self-contained
 }
