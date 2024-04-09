@@ -24,9 +24,12 @@ test *bold 3*
 
 *bold 2*
 
-_bold_
+\_bold\*
 
-test _bold_ test
+[link](www.test.com)
+
+test _bold_ [link](e.com) tet
+
 ```mermaid
 test
 tickles
