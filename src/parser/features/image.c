@@ -17,53 +17,31 @@ int is_image_link(const char *line, int line_length) {
   return (value == 0);
 }
 
-void set_image_link(md_node *node, const char *line, int line_length) {
-
+void find_and_set_image(const char *line, int line_length, char **output,
+                        int *len, char delim_start, char delim_end) {
   int i, start, end;
   end = -1;
   for (i = 0; i < line_length; i++) {
-    switch (line[i]) {
-    case '(':
+    if (line[i] == delim_start) {
       start = (i + 1);
-      break;
-    case ')':
+    } else if (line[i] == delim_end) {
       end = (i - 1);
-      break;
-    default:
-      break;
     }
-    // early exiting
     if (end != -1) {
       break;
     }
   }
-  node->url_length = end - start + 1;
-  node->url = (char *)calloc(node->url_length + 1, sizeof(char));
-  strncpy(node->url, &line[start], node->url_length);
-  node->url[node->url_length] = '\0';
+  *len = end - start + 1;
+  *output = (char *)calloc(*len + 1, sizeof(char));
+  strncpy(*output, &line[start], *len);
+  *output[*len] = '\0';
+}
+void set_image_link(md_node *node, const char *line, int line_length) {
+  find_and_set_image(line, line_length, &(node->url), &(node->url_length), '(',
+                     ')');
 }
 
 void set_image_caption(md_node *node, const char *line, int line_length) {
-  int i, start, end;
-  end = -1;
-  for (i = 0; i < line_length; i++) {
-    switch (line[i]) {
-    case '[':
-      start = (i + 1);
-      break;
-    case ']':
-      end = (i - 1);
-      break;
-    default:
-      break;
-    }
-    // early exiting
-    if (end != -1) {
-      break;
-    }
-  }
-  node->title_length = end - start + 1;
-  node->title = (char *)calloc(node->title_length + 1, sizeof(char));
-  strncpy(node->title, &line[start], node->title_length);
-  node->title[node->title_length] = '\0';
+  find_and_set_image(line, line_length, &(node->title), &(node->title_length),
+                     '[', ']');
 }
