@@ -107,59 +107,17 @@ void parse_line(md_node *root, const char *line, int line_length) {
         root->last_child->user_data != MODE_PROCESSED) {
       root->last_child->user_data = MODE_PROCESSED;
 
+      printf("end code block\n");
     } else {
       // start new node
       process_last_node(root->last_child);
 
+      printf("start code block\n");
       new_child_node = create_empty_md_node(NODE_CODE_BLOCK);
       set_code_language(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
     }
-  } else if (strcmp(line, "```mermaid") == 0) {
-    printf("entering mermaid block\n");
-    in_mermaid_block = 1;
-    free(mermaid_code); 
-    mermaid_code = calloc(1, sizeof(char));
-  } else if (in_mermaid_block) {
-      // printf("Debug line: [%.*s], length: %d\n", line_length, line, line_length);
-      // printf("CHECK: ");
-      // printf("%d", strncmp(line, "```\r\n", 3));
-      // printf("\n");
-      // It's really weird why it's not 0 and 13, wasted a lot of time here
-      // Fix it please if you can
-      if (strncmp(line, "```", 3) == 13) {
-          // Exiting the Mermaid block
-          printf("exiting mermaid block\n");
-          in_mermaid_block = 0;
-          printf("%s", mermaid_code);
-          printf("\n");
-          md_node *mermaid_node = create_md_node(NODE_MERMAID_DIAGRAM, mermaid_code, strlen(mermaid_code), NULL, NULL, root, NULL, NULL, MODE_NONE);
-          append_to_root(root, mermaid_node);
-          free(mermaid_code);
-          mermaid_code = NULL;
-      } else {
-          // Add within the Mermaid block
-          printf("adding mermaid block line\n");
-          size_t current_length = strlen(mermaid_code);
-          size_t new_len = current_length + line_length + 1; 
-          char *temp = realloc(mermaid_code, new_len + 1); 
-          if (temp) {
-              mermaid_code = temp;
-              strcat(mermaid_code, line);
-              strcat(mermaid_code, "\n"); 
-              printf("%s", mermaid_code);
-          } else {
-              fprintf(stderr, "failed to allocate memory for mermaid code\n");
-              exit(EXIT_FAILURE);
-          }
-      }
-        printf("\n\n");
-  } else {
-    printf("plain text\n");
-    if (root->user_data == MODE_CODE) {
-      // means we want to add to the previous one
-      set_code_data(root->last_child, line, line_length);
-    } else {
+    break;
 
   case LINE_LISTITEM:
 
@@ -180,8 +138,46 @@ void parse_line(md_node *root, const char *line, int line_length) {
     }
     break;
 
+  case LINE_HEADER:
+
+    process_last_node(root->last_child);
+
+    new_child_node = create_empty_md_node(NODE_HEADING);
+    set_header_data(new_child_node, line, line_length);
+    append_to_root(root, new_child_node);
+    break;
+
+  case LINE_IMAGE:
+    process_last_node(root->last_child);
+
+    new_child_node = create_empty_md_node(NODE_IMAGE);
+    set_image_link(new_child_node, line, line_length);
+    set_image_caption(new_child_node, line, line_length);
+    append_to_root(root, new_child_node);
+    break;
+
+  case LINE_TEXT:
+    if (root->last_child == NULL ||
+        root->last_child->user_data == MODE_PROCESSED) {
+      new_child_node = create_empty_md_node(NODE_PARAGRAPH);
+      append_to_root(root, new_child_node);
+    }
+
+    switch (root->last_child->type) {
+    case NODE_PARAGRAPH:
+      set_paragraph_data(root->last_child, line, line_length);
+      break;
+    case NODE_CODE_BLOCK:
+      set_code_data(root->last_child, line, line_length);
+      break;
+    default:
+      printf("should be unreachable\n");
+      break;
+    }
+    break;
+
   default:
-    printf("unknown type\n");
+    printf("unknown type %d\n", current_line_type);
     break;
   }
 

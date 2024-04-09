@@ -3,37 +3,31 @@
 random
 
 \section{header 1}
-test words
+header 1test words
 
 \subsection{Test Case 7: Wide Tree Structure}
-\begin{tikzpicture}[>=stealth]
-\node (A) at (0, 2) {A};
-\node (B) at (2, 10) {B};
-\node (C) at (2, 8) {C};
-\node (D) at (2, 6) {D};
-\node (E) at (2, 4) {E};
-\node (F) at (2, 2) {F};
-\draw[->] (A) -- (B);
-\draw[->] (A) -- (C);
-\draw[->] (A) -- (D);
-\draw[->] (A) -- (E);
-\draw[->] (A) -- (F);
-\end{tikzpicture}
-same paragraph
-\subsection{header 2}
+Test Case 7: Wide Tree Structure
+\begin{verbatim}
+graph TD;
+    A-->B;
+    A-->C;
+    A-->D;
+    A-->E;
+    A-->F;
+\end{verbatim}
 more words same paragraph
 
-test \textbf{bold} test
+test *bold* test
 
-test \textbf{bold 3}
+test *bold 3*
 
-\textbf{bold 4} test
+*bold 4* test
 
-\textbf{bold 2}
+*bold 2*
 
 \textbackslash{}_bold\textbackslash{}*
 
-\href{www.test.com}{link}
+[link](www.test.com)
 
 \begin{itemize}
 \item list item
@@ -46,13 +40,13 @@ test \textbf{bold 3}
 \item three
 \item I can't count no more
 \end{enumerate}
-test \emph{bold} \href{e.com}{link} tet
+test _bold_ [link](e.com) tet
 
 
 \begin{verbatim}
 test
-
 tickles
+
 foo
 \end{verbatim}
 \begin{figure}[h]\centering\includegraphics{image.png}\caption{caption}\end{figure}

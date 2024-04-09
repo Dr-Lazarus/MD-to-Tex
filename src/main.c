@@ -15,6 +15,7 @@ int main(int argc, char **argv) {
   }
   md_node *document = parse_source(argv[1]);
   print_tree_data(document, 0);
+  printf("parsing done\n");
 
   // Prepare the LaTeX output file
   FILE *output = fopen("output.tex", "w");

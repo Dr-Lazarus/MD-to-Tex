@@ -85,6 +85,7 @@ typedef struct md_node {
   int url_length;
   char *title;
   int title_length;
+  char *mermaid_code;
 } md_node;
 
 void print_node(md_node *node, int indent_level);

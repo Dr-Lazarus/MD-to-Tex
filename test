@@ -6,7 +6,7 @@ test words
 
 ## Test Case 7: Wide Tree Structure
 
-```mermaid
+```
 graph TD;
     A-->B;
     A-->C;
@@ -40,10 +40,11 @@ test *bold 3*
 4. I can't count no more
 
 test _bold_ [link](e.com) tet
-```mermaid
-test
 
+```
+test
 tickles
+
 foo
 ```
 

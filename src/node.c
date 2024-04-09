@@ -77,12 +77,12 @@ md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
   // node->len = len;
   node->user_data = user_data;
   if (type == NODE_MERMAID_DIAGRAM) {
-        node->mermaid_code = strdup(data);
-        node->len = strlen(data);
-    } else {
-        node->data = data;
-        node->len = len;
-    }
+    node->mermaid_code = strdup(data);
+    node->len = strlen(data);
+  } else {
+    node->data = data;
+    node->len = len;
+  }
   return node;
 }
 
