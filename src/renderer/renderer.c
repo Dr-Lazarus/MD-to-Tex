@@ -170,6 +170,8 @@ void convert_item(md_node *node, FILE *output, int entering) {
   if (entering) {
     // Directly start items without a leading paragraph command
     fprintf(output, "\\item ");
+  } else {
+    fprintf(output, "\n");
   }
   // No else case needed as items don't need explicit closing in LaTeX
 }

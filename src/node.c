@@ -1,4 +1,5 @@
 #include "node.h"
+#include <stdio.h>
 
 void print_node(md_node *node, int indent_level) {
   for (int i = 0; i < indent_level * 2; i++) {
@@ -45,11 +46,16 @@ void print_type(md_node *node, int indent_level) {
   case NODE_HEADING:
     printf("header node\n");
     break;
-  case NODE_CODE:
+  case NODE_CODE_BLOCK:
     printf("code node\n");
     break;
   case NODE_MERMAID_DIAGRAM:
     printf("mermaid node\n");
+  case NODE_IMAGE:
+    printf("image node\n");
+    break;
+  case NODE_LIST:
+    printf("list node\n");
     break;
   default:
     printf("unknown node\n");

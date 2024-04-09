@@ -1,6 +1,31 @@
 #include "list.h"
+#include <regex.h>
+#include <stdio.h>
 
-int is_list_item(const char *line, int line_length) {}
+int is_list_item(const char *line, int line_length) {
+  regex_t list_regex;
+  int value;
+  // Creation of regEx
+  // we are opinionated and need the space
+  value =
+      regcomp(&list_regex, "^(\\t| )*(\\*|-|\\+)(\\t| )(.*)$", REG_EXTENDED);
+  if (value != 0) {
+    printf("regex didn't compile\n");
+  }
+  value = regexec(&list_regex, line, 0, NULL, 0);
+  if (value == 0) {
+    return 1;
+  }
+
+  // check numbered list
+  value = regcomp(&list_regex, "^(\\t| )*(\\d.)(\\t| )(.*)$", REG_EXTENDED);
+  if (value != 0) {
+    printf("regex didn't compile\n");
+  }
+  value = regexec(&list_regex, line, 0, NULL, 0);
+
+  return (value == 0);
+}
 
 void set_item_data(md_node *node, const char *line, int line_length) {
   md_node *text_node;
@@ -19,7 +44,7 @@ void set_item_data(md_node *node, const char *line, int line_length) {
     text_node->data = (char *)realloc(
         text_node->data, line_length + text_node->len + 2 * sizeof(char));
 
-    text_node->data[text_node->len] = ' ';
+    text_node->data[text_node->len] = '\n';
     text_node->data[text_node->len + 1] = '\0';
     strncat(text_node->data, line, line_length + 1);
     // 1 more character than usual since the '\n'
@@ -27,4 +52,126 @@ void set_item_data(md_node *node, const char *line, int line_length) {
   }
 }
 
-void process_list_data(md_node *node) {}
+int check_punctuation(char *text, int text_length) {
+  char *new_line_char;
+  char initial_punc = text[0];
+  if (initial_punc >= '0' && initial_punc <= '9') {
+    // it is numbered list
+    // we don't check
+    return 1;
+  }
+
+  new_line_char = text;
+  while ((new_line_char = strstr(new_line_char, "\n")) != NULL) {
+    new_line_char++;
+    // skip if it is space or tab
+    while (new_line_char[0] == ' ' || new_line_char[0] == '\t') {
+      new_line_char++;
+    }
+
+    // if it doesnt match the initial then we ignore
+    if (new_line_char[0] != initial_punc) {
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+int check_whitespace(char *text, int text_length) { return 1; }
+
+void process_list_data(md_node *node) {
+  char *text_data = node->first_child->data;
+  int text_length = node->first_child->len;
+  node->first_child = NULL;
+  node->last_child = NULL;
+
+  // now we construct the list
+  // check that the punctuation is all the same
+  // Only checks for unnumbered list
+  if (!check_punctuation(text_data, text_length)) {
+    printf("Inconsistent punctuation in unnumbered list");
+    abort();
+  }
+  if (!check_whitespace(text_data, text_length)) {
+    printf("Inconsistent indentation");
+    abort();
+  }
+  // we cannot handle nested currently
+  char *temp_text;
+  int temp_length;
+  char *new_line_char;
+  int i;
+  char *start = text_data;
+  char *end;
+  int white_space;
+  md_node *new_list_node;
+  md_node *new_text_node;
+
+  while ((end = strstr(start, "\n")) != NULL) {
+    // we want before the \n character
+    end--;
+
+    // we skip white space, this will be helpful later
+    white_space = 0;
+    while (start[0] == ' ' || start[0] == '\t') {
+      white_space++;
+      start++;
+    }
+
+    // now we want to skip the delimiter;
+    while (start[0] != ' ' && start[0] != '\t') {
+      start++;
+    }
+    // move one forward to skip the ' ' or '\t'
+    start++;
+    temp_length = end - start + 1;
+    temp_text = (char *)calloc(temp_length + 1, sizeof(char));
+    // create the new list node
+    new_list_node = create_empty_md_node(NODE_ITEM);
+    append_to_root(node, new_list_node);
+
+    // create the text node that belongs to the list item
+    new_text_node = create_empty_md_node(NODE_TEXT);
+    append_to_root(new_list_node, new_text_node);
+
+    // copy the text data
+    new_text_node->len = end - start + 1;
+    new_text_node->data = (char *)calloc(new_text_node->len + 1, sizeof(char));
+    strncpy(new_text_node->data, start, new_text_node->len);
+    new_text_node->data[new_text_node->len] = '\0';
+
+    // we want start to skip the '\n' char
+    start = end + 2;
+  }
+  end = &text_data[text_length - 1];
+  // we skip white space, this will be helpful later
+  white_space = 0;
+  while (start[0] == ' ' || start[0] == '\t') {
+    white_space++;
+    start++;
+  }
+
+  // now we want to skip the delimiter;
+  while (start[0] != ' ' && start[0] != '\t') {
+    start++;
+  }
+  // move one forward to skip the ' ' or '\t'
+  start++;
+  temp_length = end - start + 1;
+  temp_text = (char *)calloc(temp_length + 1, sizeof(char));
+  // create the new list node
+  new_list_node = create_empty_md_node(NODE_ITEM);
+  append_to_root(node, new_list_node);
+
+  // create the text node that belongs to the list item
+  new_text_node = create_empty_md_node(NODE_TEXT);
+  append_to_root(new_list_node, new_text_node);
+
+  // copy the text data
+  new_text_node->len = end - start + 1;
+  new_text_node->data = (char *)calloc(new_text_node->len + 1, sizeof(char));
+  strncpy(new_text_node->data, start, new_text_node->len);
+  new_text_node->data[new_text_node->len] = '\0';
+  printf("processing list\n");
+}

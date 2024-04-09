@@ -48,6 +48,8 @@ LineType get_line_type(const char *line, int line_length) {
     return LINE_CODE_DELIM;
   } else if (is_image_link(line, line_length)) {
     return LINE_IMAGE;
+  } else if (is_list_item(line, line_length)) {
+    return LINE_LISTITEM;
   } else {
     return LINE_TEXT;
   }
@@ -60,7 +62,7 @@ void process_last_node(md_node *node) {
 
   switch (node->type) {
   case NODE_LIST:
-    // process_list_data(node);
+    process_list_data(node);
     break;
   case NODE_PARAGRAPH:
     process_paragraph_data(node);
@@ -87,7 +89,15 @@ void parse_line(md_node *root, const char *line, int line_length) {
 
   switch (current_line_type) {
   case LINE_EMPTY:
-    process_last_node(root->last_child);
+    if (root->last_child != NULL && root->last_child->type == NODE_CODE_BLOCK &&
+        root->last_child->user_data != MODE_PROCESSED) {
+
+      // we don't want to process last and add the code data
+      set_code_data(root->last_child, line, line_length);
+
+    } else {
+      process_last_node(root->last_child);
+    }
     break;
 
   case LINE_CODE_DELIM:
@@ -99,6 +109,7 @@ void parse_line(md_node *root, const char *line, int line_length) {
     } else {
       // start new node
       process_last_node(root->last_child);
+
       new_child_node = create_empty_md_node(NODE_CODE_BLOCK);
       set_code_language(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
@@ -148,6 +159,25 @@ void parse_line(md_node *root, const char *line, int line_length) {
       // means we want to add to the previous one
       set_code_data(root->last_child, line, line_length);
     } else {
+
+  case LINE_LISTITEM:
+
+    if (root->last_child == NULL || (root->last_child->type != NODE_LIST) ||
+        (root->last_child->user_data == MODE_PROCESSED)) {
+
+      new_child_node = create_empty_md_node(NODE_LIST);
+      append_to_root(root, new_child_node);
+    }
+
+    switch (root->last_child->type) {
+    case NODE_LIST:
+      set_item_data(root->last_child, line, line_length);
+      break;
+    default:
+      printf("should not reach\n");
+      break;
+    }
+    break;
 
   default:
     printf("unknown type\n");
