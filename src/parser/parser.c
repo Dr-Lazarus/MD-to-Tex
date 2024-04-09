@@ -2,6 +2,7 @@
 #include "features/codeblock.h"
 #include "features/headers.h"
 #include "features/image.h"
+#include "features/list.h"
 #include "features/paragraph.h"
 #ifndef TREE_H
 #define TREE_H
@@ -36,6 +37,39 @@ char *read_source_code(const char *filename) {
   return source_code;
 }
 
+LineType get_line_type(const char *line, int line_length) {
+  if (line_length == 0) {
+    return LINE_EMPTY;
+  } else if (is_header(line, line_length)) {
+    return LINE_HEADER;
+    // } else if (is_mathblock_indicator(line, line_length)) {
+    //   return LINE_MATH_DELIM;
+  } else if (is_codeblock_indicator(line, line_length)) {
+    return LINE_CODE_DELIM;
+  } else if (is_image_link(line, line_length)) {
+    return LINE_IMAGE;
+  } else {
+    return LINE_TEXT;
+  }
+}
+
+void process_last_node(md_node *node) {
+  if (node == NULL || node->user_data == MODE_PROCESSED) {
+    return;
+  }
+
+  switch (node->type) {
+  case NODE_LIST:
+    // process_list_data(node);
+    break;
+  case NODE_PARAGRAPH:
+    process_paragraph_data(node);
+  default:
+    break;
+  }
+  node->user_data = MODE_PROCESSED;
+}
+
 // the idea of this function is based on the current node, we will figure out
 // where to put the line with respect to the rest of the tree
 void parse_line(md_node *root, const char *line, int line_length) {
@@ -48,47 +82,26 @@ void parse_line(md_node *root, const char *line, int line_length) {
   md_node *new_child_node;
   // if its an empty line
   printf("type: ");
-  if (line_length == 0) {
-    printf("empty line\n");
-    // we stop appending to the previous paragraph
-    root->user_data = MODE_STARTNEW;
-    if (root->last_child->type == NODE_PARAGRAPH &&
+  LineType prev_line_type = root->prev_line_type;
+  LineType current_line_type = get_line_type(line, line_length);
+
+  switch (current_line_type) {
+  case LINE_EMPTY:
+    process_last_node(root->last_child);
+    break;
+
+  case LINE_CODE_DELIM:
+    // check if previous one was code block
+    if (root->last_child != NULL && root->last_child->type == NODE_CODE_BLOCK &&
         root->last_child->user_data != MODE_PROCESSED) {
-      process_paragraph_data(root->last_child);
       root->last_child->user_data = MODE_PROCESSED;
-    }
-  } else if (is_header(line, line_length)) {
-    printf("header\n");
-    // we are dealing with a header
-    // we go back to root
-    // we reset the mode to startnew
-    root->user_data = MODE_STARTNEW;
-    new_child_node = create_empty_md_node(NODE_HEADING);
 
-    set_header_data(new_child_node, line, line_length);
-    append_to_root(root, new_child_node);
-
-  } else if (is_codeblock_indicator(line, line_length) && strcmp(line, "```mermaid")) {
-  } else if (is_codeblock_indicator(line, line_length)) {
-    printf("code block\n");
-
-    switch (root->user_data) {
-    case MODE_CODE:
-      root->user_data = MODE_STARTNEW;
-      break;
-    case MODE_EMPTY:
-    case MODE_STARTNEW:
-      root->user_data = MODE_CODE;
+    } else {
+      // start new node
+      process_last_node(root->last_child);
       new_child_node = create_empty_md_node(NODE_CODE_BLOCK);
       set_code_language(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
-      break;
-    case MODE_APPENDPARA:
-      printf("why here\n");
-      abort();
-    default:
-      printf("Unidentified mode to start code block %d\n", root->user_data);
-      abort();
     }
   } else if (strcmp(line, "```mermaid") == 0) {
     printf("entering mermaid block\n");
@@ -136,31 +149,9 @@ void parse_line(md_node *root, const char *line, int line_length) {
       set_code_data(root->last_child, line, line_length);
     } else {
 
-      // currently assume its just text
-
-      switch (root->user_data) {
-      case MODE_STARTNEW:
-      case MODE_EMPTY:
-        new_child_node = create_empty_md_node(NODE_PARAGRAPH);
-        new_child_node->user_data = MODE_STARTNEW;
-        append_to_root(root, new_child_node);
-        printf("sertting\n");
-        set_paragraph_data(root->last_child, line, line_length);
-        break;
-      case MODE_APPENDPARA:
-        // we take the last_child of the last_child
-        if (root->last_child->type != NODE_PARAGRAPH) {
-          printf("last child is not paragraph, cannot append");
-          abort();
-        }
-        printf("adding\n");
-        set_paragraph_data(root->last_child, line, line_length);
-        break;
-      default:
-        break;
-      }
-      root->user_data = MODE_APPENDPARA;
-    }
+  default:
+    printf("unknown type\n");
+    break;
   }
 }
 

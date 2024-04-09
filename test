@@ -29,7 +29,6 @@ test *bold 3*
 [link](www.test.com)
 
 test _bold_ [link](e.com) tet
-
 ```mermaid
 test
 tickles
