@@ -79,6 +79,7 @@ int check_punctuation(char *text, int text_length) {
   return 1;
 }
 
+// TODO to implement to check for consistent white space indentation
 int check_whitespace(char *text, int text_length) { return 1; }
 
 void process_list_data(md_node *node) {
