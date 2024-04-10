@@ -12,6 +12,8 @@ typedef enum {
   NODE_BREAK,
   NODE_CODE,
   NODE_CODE_BLOCK,
+  NODE_MATH,
+  NODE_MATH_BLOCK,
   NODE_DEFINITION,
   NODE_EMPH,
   NODE_HEADING, // currently ok
@@ -36,11 +38,24 @@ typedef enum {
 typedef enum { LIST_BULLET, LIST_NUMBERED } ListType;
 
 typedef enum {
+  LINE_EMPTY,
+  LINE_LISTITEM,
+  LINE_PARAGRAPH,
+  LINE_HEADER,
+  LINE_IMAGE,
+  LINE_CODE_DELIM,
+  LINE_MATH_DELIM,
+  LINE_BLOCKTYPE,
+  LINE_TEXT
+} LineType;
+
+typedef enum {
   MODE_EMPTY,
   MODE_APPENDPARA,
   MODE_STARTNEW,
   MODE_NONE,
-  MODE_CODE
+  MODE_CODE,
+  MODE_PROCESSED
 } Mode;
 
 typedef struct md_node {
@@ -60,14 +75,16 @@ typedef struct md_node {
   int end_line;
   int end_column;
   NodeType type;
+  LineType prev_line_type;
   uint16_t flags;
 
   int heading_level;
   char *code_language;
   ListType list_type;
   char *url;
+  int url_length;
   char *title;
-
+  int title_length;
   char *mermaid_code;
 } md_node;
 
