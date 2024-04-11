@@ -3,6 +3,7 @@
 #include "../renderer/features/mermaid_graph.h"
 #include "../renderer/features/mermaid_class_diagram.h"
 #include "../renderer/features/mermaid_seq_diagram.h"
+#include "../renderer/features/mermaid_pie.h"
 #ifndef CVEC_H
 #define CVEC_H
 #include "../util/cvector.h"
@@ -337,6 +338,10 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering)
   {
     convert_sequence_diagram(mermaid_code, output);
   }
+  else if (strstr(mermaid_code, "pie title") != NULL)
+  {
+    convert_pie_chart(mermaid_code, output);
+  }
   else
   {
     convert_graph_diagram(mermaid_code, output);
@@ -369,6 +374,16 @@ void convert_class_diagram(const char *mermaid_code, FILE *output)
 
   parse_class_diagram_mermaid_code(mermaid_code, classNodes, &classCount, relationships, &relCount);
   generate_latex_class_diagram(classNodes, classCount, relationships, relCount, output);
+}
+
+void convert_pie_chart(const char *mermaid_code, FILE *output)
+{
+  char title[MAX_TITLE_LENGTH];
+  PieSection sections[MAX_PIE_SECTIONS];
+  int sectionCount = 0;
+
+  parse_pie_chart_mermaid_code(mermaid_code, title, sections, &sectionCount);
+  generate_latex_pie_chart(title, sections, sectionCount, output);
 }
 
 /*

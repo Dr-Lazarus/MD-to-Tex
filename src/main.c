@@ -49,13 +49,12 @@ int main(int argc, char **argv)
     {
     case 1:
       printf("Enter input MD file name: ");
-      inputFileName = malloc(256); // Allocate memory for file name
+      inputFileName = malloc(256);
       scanf("%s", inputFileName);
 
-      // Generate the output file name based on the input file name
       char *dot = strrchr(inputFileName, '.');
-      size_t outputFileNameLen = (dot ? (size_t)(dot - inputFileName) : strlen(inputFileName)) + 5; // +4 for ".tex" and +1 for null terminator
-      outputFileName = malloc(outputFileNameLen);                                                   // Allocate memory for the output file name
+      size_t outputFileNameLen = (dot ? (size_t)(dot - inputFileName) : strlen(inputFileName)) + 5;
+      outputFileName = malloc(outputFileNameLen);
       if (dot)
       {
         snprintf(outputFileName, outputFileNameLen, "%.*s.tex", (int)(dot - inputFileName), inputFileName);
@@ -67,8 +66,8 @@ int main(int argc, char **argv)
 
       if (strlen(outputFileName) == 0)
       {
-        free(outputFileName);                  // Free if no input was provided
-        outputFileName = strdup("output.tex"); // Use default name
+        free(outputFileName);
+        outputFileName = strdup("output.tex");
       }
 
       md_node *document = parse_source(inputFileName);
@@ -92,7 +91,10 @@ int main(int argc, char **argv)
         return 1;
       }
 
-      fprintf(output, "\\documentclass{article}\n\\begin{document}\n");
+      fprintf(output, "\\documentclass{article}\n");
+      fprintf(output, "\\usepackage{tikz}\n");
+      fprintf(output, "\\usepackage{pgf-pie}\n");
+      fprintf(output, "\\begin{document}\n");
       traverse_ast(document, output);
       fprintf(output, "\\end{document}\n");
 
