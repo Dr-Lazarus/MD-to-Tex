@@ -1,13 +1,13 @@
 #include "renderer.h"
-#include "iterator.h"
-#include "../renderer/features/mermaid_graph.h"
 #include "../renderer/features/mermaid_class_diagram.h"
+#include "../renderer/features/mermaid_graph.h"
 #include "../renderer/features/mermaid_seq_diagram.h"
 #include "../renderer/features/mermaid_pie.h"
 #ifndef CVEC_H
 #define CVEC_H
 #include "../util/cvector.h"
 #endif
+#include "iterator.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -344,6 +344,15 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering)
   }
   else
   {
+  const char *mermaid_code = md_node_get_mermaid_code(node);
+  if (!mermaid_code)
+    return;
+
+  if (strstr(mermaid_code, "classDiagram") != NULL) {
+    convert_class_diagram(mermaid_code, output);
+  } else if (strstr(mermaid_code, "sequenceDiagram") != NULL) {
+    convert_sequence_diagram(mermaid_code, output);
+  } else {
     convert_graph_diagram(mermaid_code, output);
   }
 }
@@ -368,12 +377,17 @@ void convert_sequence_diagram(const char *mermaid_code, FILE *output) {
  */
 void convert_class_diagram(const char *mermaid_code, FILE *output)
 {
+void convert_sequence_diagram(const char *mermaid_code, FILE *output) {}
+
+void convert_class_diagram(const char *mermaid_code, FILE *output) {
   ClassNode classNodes[MAX_CLASSES];
   ClassRelationship relationships[MAX_RELATIONSHIPS];
   int classCount = 0, relCount = 0;
 
-  parse_class_diagram_mermaid_code(mermaid_code, classNodes, &classCount, relationships, &relCount);
-  generate_latex_class_diagram(classNodes, classCount, relationships, relCount, output);
+  parse_class_diagram_mermaid_code(mermaid_code, classNodes, &classCount,
+                                   relationships, &relCount);
+  generate_latex_class_diagram(classNodes, classCount, relationships, relCount,
+                               output);
 }
 
 void convert_pie_chart(const char *mermaid_code, FILE *output)
@@ -392,6 +406,7 @@ void convert_pie_chart(const char *mermaid_code, FILE *output)
  */
 void convert_graph_diagram(const char *mermaid_code, FILE *output)
 {
+void convert_graph_diagram(const char *mermaid_code, FILE *output) {
   char node_list[MAX_NODES] = {0};
   Edge edge_list[MAX_EDGES];
   int edge_count = 0;

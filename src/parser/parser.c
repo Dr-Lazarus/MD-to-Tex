@@ -39,7 +39,7 @@ char *read_source_code(const char *filename)
 }
 
 LineType get_line_type(const char *line, int line_length) {
-  if (line_length == 1 && line[0] == '\n') {
+  if (line_length == 0) {
     return LINE_EMPTY;
   }
   else if (is_header(line, line_length))
@@ -370,7 +370,7 @@ md_node *parse_source(char *file_name) {
   md_node *new_child_node;
 
   while ((ptr = strstr(ptr, "\n")) != NULL) {
-    line_length = ptr - start + 1;
+    line_length = ptr - start;
     // perform realloc if not sufficient length
     if (line_size < line_length) {
       while (line_size < line_length) {
