@@ -170,7 +170,6 @@ void parse_line(md_node *root, const char *line, int line_length,
   } else if (current_line_type == LINE_LISTITEM) {
 
     // check indentation level
-    indent = 0;
     for (indent = 0; indent < line_length; indent++) {
       if (line[indent] != ' ') {
         break;
@@ -188,7 +187,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     // if the last child was not a list
     // we add if indent == 0
     // otherwise we throw an error
-    if (prev_node->type != NODE_LIST && indent != 0) {
+    if (prev_node != NULL && prev_node->type != NODE_LIST && indent != 0) {
       printf("Line %d: Not allowed to have nested list declared immediately\n",
              line_number);
       abort();
@@ -196,9 +195,9 @@ void parse_line(md_node *root, const char *line, int line_length,
 
     nested = indent / INDENT_SPACE;
 
-    printf("%d\n", nested);
     // we go n - 1 for the depth.
     // so if its 1 nested, we try to go from root down once
+
     list_child = root;
     for (i = 0; i < nested; i++) {
       if (list_child->last_child != NULL &&
@@ -206,7 +205,7 @@ void parse_line(md_node *root, const char *line, int line_length,
         list_child = list_child->last_child;
       } else {
         printf(
-            "Line %d: Indentation level should only be incremental. Jumping "
+            "Line %d: Indentation level should only be incremental. Jumping \n"
             "from depth of %d to depth of %d is not allowed\n",
             line_number, i, nested);
         abort();
@@ -214,6 +213,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     }
     // now we create the list node if the last node was not list
     // we should also create if the previous list is in MODE_PROCESSED
+
     if (list_child->last_child == NULL ||
         list_child->last_child->type != NODE_LIST ||
         (list_child->last_child->type == NODE_LIST &&
@@ -224,6 +224,7 @@ void parse_line(md_node *root, const char *line, int line_length,
       prev_node = new_child_node;
     }
 
+    printf("past the loop\n");
     // we should check all the other conditions for delimiter information
 
     // now we create the node itself with the data
@@ -237,15 +238,15 @@ void parse_line(md_node *root, const char *line, int line_length,
     indent++;
 
     new_child_node = create_md_node(NODE_ITEM, line_number, line_number, indent,
-                                    line_number - 1);
+                                    line_length - 1);
     append_to_root(prev_node, new_child_node);
     prev_node = new_child_node;
     new_child_node = create_md_node(NODE_TEXT, line_number, line_number, indent,
-                                    line_number - 1);
-    new_child_node->len = line_number - indent;
+                                    line_length - 1);
+    new_child_node->len = line_length - indent;
     new_child_node->data =
         (char *)calloc(new_child_node->len + 1, sizeof(char));
-    strncpy(new_child_node->data, &line[indent], new_child_node->len);
+    strncpy(new_child_node->data, &(line[indent]), new_child_node->len);
     new_child_node->data[new_child_node->len] = '\0';
     append_to_root(prev_node, new_child_node);
 
