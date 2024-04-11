@@ -58,7 +58,6 @@ void traverse_ast(md_node *root, FILE *output)
         entering = ev_type == EVENT_ENTER;
         convert_mermaid_diagram(node, output, entering);
         ev_type = md_iter_next(iter);
-        ev_type = md_iter_next(iter);
       }
       else
       {
