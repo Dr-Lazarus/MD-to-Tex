@@ -41,3 +41,5 @@
 .log
 .synctex.gz
 .pdf
+
+md_to_tex
