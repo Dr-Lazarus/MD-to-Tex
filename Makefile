@@ -1,6 +1,6 @@
 CFLAGS = -Wall -Werror -ansi -pedantic
 # CFLAGS = -Wall -Werror
-OFILES = main.o parser.o tree.o codeblock.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o
+OFILES = main.o parser.o tree.o codeblock.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o mermaid_pie.o
 
 main: $(OFILES)
 	gcc $(OFILES) -o md_to_tex
@@ -51,6 +51,9 @@ mermaid_class_diagram.o: src/renderer/features/mermaid_class_diagram.h src/rende
 
 mermaid_seq_diagram.o: src/renderer/features/mermaid_seq_diagram.h src/renderer/features/mermaid_seq_diagram.c
 	gcc -c src/renderer/features/mermaid_seq_diagram.c -o mermaid_seq_diagram.o
+
+mermaid_pie.o: src/renderer/features/mermaid_pie.h src/renderer/features/mermaid_pie.c
+	gcc -c src/renderer/features/mermaid_pie.c -o mermaid_pie.o
 
 ## UTIL FILES
 util.o: src/util/util.c src/util/util.h

@@ -8,8 +8,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char **argv) {
-  if (argc != 2) {
+int main(int argc, char **argv)
+{
+  if (argc != 2)
+  {
     printf("No file specified");
     return 1;
   }
@@ -19,14 +21,18 @@ int main(int argc, char **argv) {
 
   // Prepare the LaTeX output file
   FILE *output = fopen("output.tex", "w");
-  if (!output) {
+  if (!output)
+  {
     perror("Error opening output file");
     free_tree(document);
     return 1;
   }
 
   // Write the LaTeX document preamble
-  fprintf(output, "\\documentclass{article}\n\\begin{document}\n");
+  fprintf(output, "\\documentclass{article}\n");
+  fprintf(output, "\\usepackage{tikz}\n");
+  fprintf(output, "\\usepackage{pgf-pie}\n");
+  fprintf(output, "\\begin{document}\n");
 
   // Traverse the document tree and convert to LaTeX
   traverse_ast(document, output);
