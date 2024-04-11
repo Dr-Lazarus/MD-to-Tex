@@ -94,6 +94,7 @@ int main(int argc, char **argv)
       fprintf(output, "\\documentclass{article}\n");
       fprintf(output, "\\usepackage{tikz}\n");
       fprintf(output, "\\usepackage{pgf-pie}\n");
+      fprintf(output, "\\usepackage{pgf-umlsd}\n");
       fprintf(output, "\\begin{document}\n");
       traverse_ast(document, output);
       fprintf(output, "\\end{document}\n");
