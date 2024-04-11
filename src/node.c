@@ -1,25 +1,33 @@
 #include "node.h"
 #include <stdio.h>
 
-void print_node(md_node *node, int indent_level) {
-  for (int i = 0; i < indent_level * 2; i++) {
+void print_node(md_node *node, int indent_level)
+{
+  for (int i = 0; i < indent_level * 2; i++)
+  {
     printf(" ");
   }
-  if (node->data != NULL) {
+  if (node->data != NULL)
+  {
     printf("data: %s\n", node->data);
-  } else {
+  }
+  else
+  {
     printf("data: None\n");
   }
 
-  switch (node->type) {
+  switch (node->type)
+  {
   case NODE_HEADING:
-    for (int i = 0; i < indent_level * INDENTATION; i++) {
+    for (int i = 0; i < indent_level * INDENTATION; i++)
+    {
       printf(" ");
     }
     printf("level: %d\n", node->heading_level);
     break;
   case NODE_CODE:
-    for (int i = 0; i < indent_level * 2; i++) {
+    for (int i = 0; i < indent_level * 2; i++)
+    {
       printf(" ");
     }
     printf("lang: %s\n", node->code_language);
@@ -29,11 +37,14 @@ void print_node(md_node *node, int indent_level) {
   }
 }
 
-void print_type(md_node *node, int indent_level) {
-  for (int i = 0; i < indent_level * INDENTATION; i++) {
+void print_type(md_node *node, int indent_level)
+{
+  for (int i = 0; i < indent_level * INDENTATION; i++)
+  {
     printf(" ");
   }
-  switch (node->type) {
+  switch (node->type)
+  {
   case NODE_ROOT:
     printf("root node\n");
     break;
@@ -65,7 +76,8 @@ void print_type(md_node *node, int indent_level) {
 
 md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
                         md_node *prev, md_node *parent, md_node *first_child,
-                        md_node *last_child, Mode user_data) {
+                        md_node *last_child, Mode user_data)
+{
   md_node *node = (md_node *)malloc(sizeof(md_node));
   node->type = type;
   node->next = next;
@@ -76,17 +88,21 @@ md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
   // node->data = data;
   // node->len = len;
   node->user_data = user_data;
-  if (type == NODE_MERMAID_DIAGRAM) {
+  if (type == NODE_MERMAID_DIAGRAM)
+  {
     node->mermaid_code = strdup(data);
     node->len = strlen(data);
-  } else {
+  }
+  else
+  {
     node->data = data;
     node->len = len;
   }
   return node;
 }
 
-md_node *create_empty_md_node(NodeType type) {
+md_node *create_empty_md_node(NodeType type)
+{
   return create_md_node(type, NULL, 0, NULL, NULL, NULL, NULL, NULL, MODE_NONE);
 }
 
