@@ -14,7 +14,7 @@ typedef struct {
 typedef struct {
     char fromId[50]; 
     char toId[50]; 
-    char label[50]; // type of relationship (e.g., aggregation, composition)
+    char label[50];
 } ClassRelationship;
 
 void parse_class_diagram_mermaid_code(const char* mermaidCode, ClassNode* classNodes, int* classNodeCount, ClassRelationship* relationships, int* relationshipCount);
