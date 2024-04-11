@@ -58,7 +58,7 @@ void parse_seq_diagram_mermaid_code(const char *mermaid_code, Cvector *threads,
     code_cursor++;
    }
 
-   if (code_cursor == '\0') {
+   if (*code_cursor == '\0') {
     printf(
         "Error in parse_seq_diagram_mermaid_code: Unexpected text end after "
         "participant");
