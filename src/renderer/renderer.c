@@ -3,6 +3,10 @@
 #include "../renderer/features/mermaid_graph.h"
 #include "../renderer/features/mermaid_class_diagram.h"
 #include "../renderer/features/mermaid_seq_diagram.h"
+#ifndef CVEC_H
+#define CVEC_H
+#include "../util/cvector.h"
+#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
@@ -53,7 +57,6 @@ void traverse_ast(md_node *root, FILE *output)
         node = md_iter_get_node(iter);
         entering = ev_type == EVENT_ENTER;
         convert_mermaid_diagram(node, output, entering);
-        ev_type = md_iter_next(iter);
         ev_type = md_iter_next(iter);
       }
       else
@@ -343,7 +346,16 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering)
 /*
  * Converts a Mermaid sequence diagram into LaTeX.
  */
-void convert_sequence_diagram(const char *mermaid_code, FILE *output) {}
+void convert_sequence_diagram(const char *mermaid_code, FILE *output) {
+ Cvector *threads = cvec_init(0, sizeof(SeqThread));
+ Cvector *messages = cvec_init(0, sizeof(SeqMessage));
+
+ parse_seq_diagram_mermaid_code(mermaid_code, threads, messages);
+ generate_seq_class_diagram(threads, messages, output);
+
+ cvec_free(threads);
+ cvec_free(messages);
+}
 
 /*
  * Parses and converts a Mermaid class diagram into LaTeX, generating a
