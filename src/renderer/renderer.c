@@ -335,13 +335,10 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering)
   {
     convert_sequence_diagram(mermaid_code, output);
   }
-<<<<<<< HEAD
   else if (strstr(mermaid_code, "pie title") != NULL)
   {
     convert_pie_chart(mermaid_code, output);
   }
-=======
->>>>>>> main
   else
   {
     convert_graph_diagram(mermaid_code, output);
@@ -367,7 +364,6 @@ void convert_class_diagram(const char *mermaid_code, FILE *output)
   generate_latex_class_diagram(classNodes, classCount, relationships, relCount, output);
 }
 
-<<<<<<< HEAD
 void convert_pie_chart(const char *mermaid_code, FILE *output)
 {
   char title[MAX_TITLE_LENGTH];
@@ -378,8 +374,6 @@ void convert_pie_chart(const char *mermaid_code, FILE *output)
   generate_latex_pie_chart(title, sections, sectionCount, output);
 }
 
-=======
->>>>>>> main
 /*
  * Parses and converts a Mermaid graph diagram into LaTeX, generating a
  * graph layout using LaTeX commands based on the parsed structure.
