@@ -56,10 +56,12 @@ LineType get_line_type(const char *line, int line_length) {
 void parse_line(md_node *root, const char *line, int line_length,
                 int line_number) {
 
+  int i, indent, nested;
   LineType current_line_type;
   NodeType prev_node_type;
   md_node *prev_node;
   md_node *new_child_node;
+  md_node *list_child;
   // we get the line type first
   current_line_type = get_line_type(line, line_length);
 
@@ -119,6 +121,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     new_child_node->user_data = MODE_PROCESSED;
     set_header_data(new_child_node, line, line_length);
     append_to_root(root, new_child_node);
+
   } else if (current_line_type == LINE_IMAGE) {
 
     prev_node->user_data = MODE_PROCESSED;
@@ -128,14 +131,17 @@ void parse_line(md_node *root, const char *line, int line_length,
     set_image_link(new_child_node, line, line_length);
     set_image_caption(new_child_node, line, line_length);
     append_to_root(root, new_child_node);
+
   } else if (current_line_type == LINE_EMPTY) {
 
     // helps terminate the previous paragraph if necessary
-    if (prev_node_type == NODE_PARAGRAPH &&
+    if ((prev_node_type == NODE_PARAGRAPH || prev_node_type == NODE_LIST) &&
         prev_node->user_data == MODE_APPEND) {
       prev_node->user_data = MODE_PROCESSED;
     }
+
   } else if (current_line_type == LINE_TEXT) {
+
     // if previous node is not a appending paragraph,
     // we need to create a new appending paragraph
     if (!(prev_node_type == NODE_PARAGRAPH &&
@@ -160,7 +166,90 @@ void parse_line(md_node *root, const char *line, int line_length,
     }
     append_to_root(root->last_child, new_child_node);
     parse_new_paragraph_line(prev_node);
+
   } else if (current_line_type == LINE_LISTITEM) {
+
+    // check indentation level
+    indent = 0;
+    for (indent = 0; indent < line_length; indent++) {
+      if (line[indent] != ' ') {
+        break;
+      }
+    }
+    // check if indent is correct
+    if (indent % INDENT_SPACE != 0) {
+      printf(
+          "Line %d: Inconsistent indentation with %d. Supposed to only be "
+          "multiples of %d\n",
+          line_number, indent, INDENT_SPACE);
+      abort();
+    }
+
+    // if the last child was not a list
+    // we add if indent == 0
+    // otherwise we throw an error
+    if (prev_node->type != NODE_LIST && indent != 0) {
+      printf("Line %d: Not allowed to have nested list declared immediately\n",
+             line_number);
+      abort();
+    }
+
+    nested = indent / INDENT_SPACE;
+
+    printf("%d\n", nested);
+    // we go n - 1 for the depth.
+    // so if its 1 nested, we try to go from root down once
+    list_child = root;
+    for (i = 0; i < nested; i++) {
+      if (list_child->last_child != NULL &&
+          list_child->last_child->type == NODE_LIST) {
+        list_child = list_child->last_child;
+      } else {
+        printf(
+            "Line %d: Indentation level should only be incremental. Jumping "
+            "from depth of %d to depth of %d is not allowed\n",
+            line_number, i, nested);
+        abort();
+      }
+    }
+    // now we create the list node if the last node was not list
+    // we should also create if the previous list is in MODE_PROCESSED
+    if (list_child->last_child == NULL ||
+        list_child->last_child->type != NODE_LIST ||
+        (list_child->last_child->type == NODE_LIST &&
+         list_child->last_child->user_data == MODE_PROCESSED)) {
+      new_child_node = create_md_node(NODE_LIST, line_number, line_number, 0,
+                                      line_length - 1);
+      append_to_root(list_child, new_child_node);
+      prev_node = new_child_node;
+    }
+
+    // we should check all the other conditions for delimiter information
+
+    // now we create the node itself with the data
+    // we check for when we reach the next space
+    for (; indent < line_length; indent++) {
+      if (line[indent] == ' ') {
+        break;
+      }
+    }
+    // we then ignore the space
+    indent++;
+
+    new_child_node = create_md_node(NODE_ITEM, line_number, line_number, indent,
+                                    line_number - 1);
+    append_to_root(prev_node, new_child_node);
+    prev_node = new_child_node;
+    new_child_node = create_md_node(NODE_TEXT, line_number, line_number, indent,
+                                    line_number - 1);
+    new_child_node->len = line_number - indent;
+    new_child_node->data =
+        (char *)calloc(new_child_node->len + 1, sizeof(char));
+    strncpy(new_child_node->data, &line[indent], new_child_node->len);
+    new_child_node->data[new_child_node->len] = '\0';
+    append_to_root(prev_node, new_child_node);
+
+    // now that we have checked through all the requirements,
   } else {
     printf("Line %d: Ignoring line %s, unknown\n", line_number,
            print_line_type(current_line_type));
