@@ -62,6 +62,9 @@ void parse_line(md_node *root, const char *line, int line_length,
   md_node *prev_node;
   md_node *new_child_node;
   md_node *list_child;
+  char *delimiter;
+  int delimiter_length;
+  int initial;
   // we get the line type first
   current_line_type = get_line_type(line, line_length);
 
@@ -220,6 +223,13 @@ void parse_line(md_node *root, const char *line, int line_length,
          list_child->last_child->user_data == MODE_PROCESSED)) {
       new_child_node = create_md_node(NODE_LIST, line_number, line_number, 0,
                                       line_length - 1);
+      // we also identify what kind of list is it
+      if (line[indent] >= '0' && line[indent] <= '9') {
+        new_child_node->list_type = LIST_NUMBERED;
+      } else {
+        new_child_node->list_type = LIST_BULLET;
+      }
+
       append_to_root(list_child, new_child_node);
       prev_node = new_child_node;
     }
@@ -229,11 +239,21 @@ void parse_line(md_node *root, const char *line, int line_length,
 
     // now we create the node itself with the data
     // we check for when we reach the next space
-    for (; indent < line_length; indent++) {
+    delimiter = (char *)calloc(line_length, sizeof(char));
+    delimiter_length = 0;
+    for (initial = indent; indent < line_length; indent++) {
       if (line[indent] == ' ') {
         break;
       }
+
+      delimiter[indent - initial] = line[indent];
+      delimiter_length++;
     }
+    delimiter[delimiter_length] = '\0';
+    // we should do all the checks
+    // first, we identify if the delimiter is correct
+    printf("delimiter: %s\n", delimiter);
+
     // we then ignore the space
     indent++;
 
@@ -271,8 +291,7 @@ md_node *parse_source(char *file_name) {
   char *ptr = file_contents;
   char *start = file_contents;
 
-  while ((ptr = strstr(ptr, "\n")) != NULL ||
-         ((ptr = strstr(ptr, "\0")) != NULL)) {
+  while ((ptr = strstr(ptr, "\n")) != NULL) {
     line_length = ptr - start;
     // perform realloc if not sufficient length
     if (line_size < line_length) {
