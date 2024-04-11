@@ -1,16 +1,15 @@
-typedef struct
-{
-    char *data;
-    /* Number of elements in the vector */
-    int size;
-    /* Size of each vector element */
-    int elem_size;
-    /* Maximum number of elements in the vector before data needs realloc
+typedef struct {
+ char *data;
+ /* Number of elements in the vector */
+ int size;
+ /* Size of each vector element */
+ int elem_size;
+ /* Maximum number of elements in the vector before data needs realloc
     Will be increased and decreased exponentially.
     For example, if a c_vector with 5 is initialized, it's capacity will be 8.
     When it eventually grows to 8 elements and push_back is called, it will increase its capacity to 16.
     The capacity will only be realloc'd back to 8 when there is (capacity/4) elements left in the vector (So in this case, 4 elements)*/
-    int capacity;
+ int capacity;
 } Cvector;
 
 /* Initialize a Cvector.
