@@ -17,9 +17,11 @@ static int in_mermaid_block = 0;
 static char *mermaid_code = NULL;
 
 // first we need some code to read the file
-char *read_source_code(const char *filename) {
+char *read_source_code(const char *filename)
+{
   FILE *file = fopen(filename, "r");
-  if (file == NULL) {
+  if (file == NULL)
+  {
     fprintf(stderr, "Error opening file: %s\n", filename);
     exit(EXIT_FAILURE);
   }
@@ -27,7 +29,8 @@ char *read_source_code(const char *filename) {
   long file_size = ftell(file);
   rewind(file);
   char *source_code = (char *)malloc((file_size + 1) * sizeof(char));
-  if (source_code == NULL) {
+  if (source_code == NULL)
+  {
     fprintf(stderr, "Error allocating memory for source code\n");
     exit(EXIT_FAILURE);
   }
@@ -37,31 +40,46 @@ char *read_source_code(const char *filename) {
   return source_code;
 }
 
-LineType get_line_type(const char *line, int line_length) {
-  if (line_length == 0) {
+LineType get_line_type(const char *line, int line_length)
+{
+  if (line_length == 0)
+  {
     return LINE_EMPTY;
-  } else if (is_header(line, line_length)) {
+  }
+  else if (is_header(line, line_length))
+  {
     return LINE_HEADER;
     // } else if (is_mathblock_indicator(line, line_length)) {
     //   return LINE_MATH_DELIM;
-  } else if (is_codeblock_indicator(line, line_length)) {
+  }
+  else if (is_codeblock_indicator(line, line_length))
+  {
     return LINE_CODE_DELIM;
-  } else if (is_image_link(line, line_length)) {
+  }
+  else if (is_image_link(line, line_length))
+  {
     return LINE_IMAGE;
-  } else if (is_list_item(line, line_length)) {
+  }
+  else if (is_list_item(line, line_length))
+  {
     printf("is list\n");
     return LINE_LISTITEM;
-  } else {
+  }
+  else
+  {
     return LINE_TEXT;
   }
 }
 
-void process_last_node(md_node *node) {
-  if (node == NULL || node->user_data == MODE_PROCESSED) {
+void process_last_node(md_node *node)
+{
+  if (node == NULL || node->user_data == MODE_PROCESSED)
+  {
     return;
   }
 
-  switch (node->type) {
+  switch (node->type)
+  {
   case NODE_LIST:
     process_list_data(node);
     break;
@@ -75,9 +93,11 @@ void process_last_node(md_node *node) {
 
 // the idea of this function is based on the current node, we will figure out
 // where to put the line with respect to the rest of the tree
-void parse_line(md_node *root, const char *line, int line_length) {
+void parse_line(md_node *root, const char *line, int line_length)
+{
   // first we check what content we have.
-  if (line == NULL) {
+  if (line == NULL)
+  {
     printf("Line should have something\n");
     abort();
   }
@@ -88,15 +108,18 @@ void parse_line(md_node *root, const char *line, int line_length) {
   LineType prev_line_type = root->prev_line_type;
   LineType current_line_type = get_line_type(line, line_length);
 
-  switch (current_line_type) {
+  switch (current_line_type)
+  {
   case LINE_EMPTY:
     if (root->last_child != NULL && root->last_child->type == NODE_CODE_BLOCK &&
-        root->last_child->user_data != MODE_PROCESSED) {
+        root->last_child->user_data != MODE_PROCESSED)
+    {
 
       // we don't want to process last and add the code data
       set_code_data(root->last_child, line, line_length);
-
-    } else {
+    }
+    else
+    {
       process_last_node(root->last_child);
     }
     break;
@@ -104,11 +127,14 @@ void parse_line(md_node *root, const char *line, int line_length) {
   case LINE_CODE_DELIM:
     // check if previous one was code block
     if (root->last_child != NULL && root->last_child->type == NODE_CODE_BLOCK &&
-        root->last_child->user_data != MODE_PROCESSED) {
+        root->last_child->user_data != MODE_PROCESSED)
+    {
       root->last_child->user_data = MODE_PROCESSED;
 
       printf("end code block\n");
-    } else {
+    }
+    else
+    {
       // start new node
       process_last_node(root->last_child);
 
@@ -122,13 +148,15 @@ void parse_line(md_node *root, const char *line, int line_length) {
   case LINE_LISTITEM:
 
     if (root->last_child == NULL || (root->last_child->type != NODE_LIST) ||
-        (root->last_child->user_data == MODE_PROCESSED)) {
+        (root->last_child->user_data == MODE_PROCESSED))
+    {
 
       new_child_node = create_empty_md_node(NODE_LIST);
       append_to_root(root, new_child_node);
     }
 
-    switch (root->last_child->type) {
+    switch (root->last_child->type)
+    {
     case NODE_LIST:
       set_item_data(root->last_child, line, line_length);
       break;
@@ -158,16 +186,19 @@ void parse_line(md_node *root, const char *line, int line_length) {
 
   case LINE_TEXT:
     if (root->last_child != NULL && root->last_child->type != NODE_PARAGRAPH &&
-        root->last_child->type != NODE_CODE_BLOCK) {
+        root->last_child->type != NODE_CODE_BLOCK)
+    {
       process_last_node(root->last_child);
     }
     if (root->last_child == NULL ||
-        root->last_child->user_data == MODE_PROCESSED) {
+        root->last_child->user_data == MODE_PROCESSED)
+    {
       new_child_node = create_empty_md_node(NODE_PARAGRAPH);
       append_to_root(root, new_child_node);
     }
 
-    switch (root->last_child->type) {
+    switch (root->last_child->type)
+    {
     case NODE_PARAGRAPH:
       set_paragraph_data(root->last_child, line, line_length);
       break;
@@ -188,7 +219,8 @@ void parse_line(md_node *root, const char *line, int line_length) {
   root->prev_line_type = current_line_type;
 }
 
-md_node *parse_source(char *file_name) {
+md_node *parse_source(char *file_name)
+{
 
   char *file_contents = read_source_code(file_name);
 
@@ -202,10 +234,13 @@ md_node *parse_source(char *file_name) {
   char *ptr = file_contents;
   char *start = file_contents;
 
-  while ((ptr = strstr(ptr, "\n")) != NULL) {
+  while ((ptr = strstr(ptr, "\n")) != NULL)
+  {
     line_length = ptr - start;
-    if (line_size < line_length) {
-      while (line_size < line_length) {
+    if (line_size < line_length)
+    {
+      while (line_size < line_length)
+      {
         line_size *= 2;
       }
       line = (char *)realloc(line, line_size * sizeof(char));
@@ -228,8 +263,10 @@ md_node *parse_source(char *file_name) {
   }
   // last line needs to be considered also
   line_length = strlen(file_contents) - char_so_far;
-  if (line_size < line_length) {
-    while (line_size < line_length) {
+  if (line_size < line_length)
+  {
+    while (line_size < line_length)
+    {
       line_size *= 2;
     }
     line = (char *)realloc(line, line_size * sizeof(char));
