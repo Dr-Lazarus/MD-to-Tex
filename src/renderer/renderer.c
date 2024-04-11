@@ -62,6 +62,9 @@ void traverse_ast(md_node *root, FILE *output) {
           convert_code_block(node, output, entering);
         }
         break;
+      case NODE_MATH_BLOCK:
+        convert_math_block(node, output, entering);
+        break;
       case NODE_CODE:
         convert_code(node, output, entering);
         break;
@@ -231,6 +234,10 @@ void convert_strong(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\textbf{" : "}");
 }
 
+void convert_math_block(md_node *node, FILE *output, int entering) {
+  fprintf(output, entering ? "\n\\begin{align*}\n" : "\n\\end{align*}\n");
+}
+
 void convert_math(md_node *node, FILE *output, int entering) {
   fprintf(output, "$");
 }
@@ -270,10 +277,11 @@ void convert_image(md_node *node, FILE *output, int entering) {
   if (entering) {
     const char *url = md_node_get_url(node);
     const char *alt_text = md_node_get_title(node);
-    fprintf(output,
-            "\\begin{figure}[h]\\centering\\includegraphics{%s}\\caption{%s}"
-            "\\end{figure}\n",
-            url, alt_text ? alt_text : "");
+    fprintf(
+        output,
+        "\\begin{figure}[h]\n\\centering\n\\includegraphics{%s}\n\\caption{%s}"
+        "\n\\end{figure}\n",
+        url, alt_text ? alt_text : "");
   }
 }
 

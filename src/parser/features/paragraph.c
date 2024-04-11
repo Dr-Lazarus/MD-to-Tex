@@ -59,6 +59,10 @@ void copy_text_to_paragraph(md_node *paragraph_node, char *text, char *start,
   new_child_node =
       create_md_node(NODE_TEXT, start_line, end_line, start - text, end - text);
   new_child_node->len = end - start + 1;
+  if (new_child_node->len == 0) {
+    free(new_child_node);
+    return;
+  }
   new_child_node->data = (char *)calloc(new_child_node->len + 1, sizeof(char));
   strncpy(new_child_node->data, start, new_child_node->len);
   new_child_node->data[new_child_node->len] = '\0';

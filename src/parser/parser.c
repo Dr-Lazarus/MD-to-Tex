@@ -53,6 +53,120 @@ LineType get_line_type(const char *line, int line_length) {
   }
 }
 
+void parse_line(md_node *root, const char *line, int line_length,
+                int line_number) {
+
+  LineType current_line_type;
+  NodeType prev_node_type;
+  md_node *prev_node;
+  md_node *new_child_node;
+  // we get the line type first
+  current_line_type = get_line_type(line, line_length);
+
+  // now we want to figure out how it fits in the Tree
+  // First we check what the last node is
+  if (root->last_child == NULL) {
+    prev_node_type = NODE_NONE;
+  } else {
+    prev_node_type = root->last_child->type;
+  }
+  prev_node = root->last_child;
+
+  // Now we want to figure out how does this line fit in the Tree
+  printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
+         print_line_type(current_line_type), print_node_type(prev_node_type));
+  printf("Line %d data: %s\n", line_number, line);
+
+  if ((prev_node_type == NODE_CODE_BLOCK ||
+       prev_node_type == NODE_MATH_BLOCK) &&
+      prev_node->user_data == MODE_APPEND) {
+
+    // if the line is a delimiter
+    if ((prev_node_type == NODE_CODE_BLOCK &&
+         current_line_type == LINE_CODE_DELIM) ||
+        (prev_node_type == NODE_MATH_BLOCK &&
+         current_line_type == LINE_MATH_DELIM)) {
+      // we terminate the current prev_node
+      printf("ending block\n");
+      collate_children_text(prev_node);
+      prev_node->end_line = line_number;
+      prev_node->user_data = MODE_PROCESSED;
+    } else {
+      prev_node->end_line = line_number;
+      new_child_node =
+          create_md_node(NODE_TEXT, line_number, line_number, 0, line_length);
+      set_text_data(new_child_node, line, line_length, line_number);
+      append_to_root(root->last_child, new_child_node);
+    }
+  } else if (current_line_type == LINE_CODE_DELIM ||
+             current_line_type == LINE_MATH_DELIM) {
+
+    // so if the previous node is not in append mode, we should jump here
+    // and create the new code block
+    new_child_node =
+        create_md_node(current_line_type == LINE_CODE_DELIM ? NODE_CODE_BLOCK
+                                                            : NODE_MATH_BLOCK,
+                       line_number, line_number, -1, -1);
+    set_code_language(new_child_node, line, line_length);
+    append_to_root(root, new_child_node);
+  } else if (current_line_type == LINE_HEADER) {
+    // if it is a header
+    // it doesn't matter what the last node is
+    // we will just mark previous node as processed.
+    prev_node->user_data = MODE_PROCESSED;
+    new_child_node =
+        create_md_node(NODE_HEADING, line_number, line_number, -1, -1);
+    new_child_node->user_data = MODE_PROCESSED;
+    set_header_data(new_child_node, line, line_length);
+    append_to_root(root, new_child_node);
+  } else if (current_line_type == LINE_IMAGE) {
+
+    prev_node->user_data = MODE_PROCESSED;
+    new_child_node =
+        create_md_node(NODE_IMAGE, line_number, line_number, -1, -1);
+    new_child_node->user_data = MODE_PROCESSED;
+    set_image_link(new_child_node, line, line_length);
+    set_image_caption(new_child_node, line, line_length);
+    append_to_root(root, new_child_node);
+  } else if (current_line_type == LINE_EMPTY) {
+
+    // helps terminate the previous paragraph if necessary
+    if (prev_node_type == NODE_PARAGRAPH &&
+        prev_node->user_data == MODE_APPEND) {
+      prev_node->user_data = MODE_PROCESSED;
+    }
+  } else if (current_line_type == LINE_TEXT) {
+    // if previous node is not a appending paragraph,
+    // we need to create a new appending paragraph
+    if (!(prev_node_type == NODE_PARAGRAPH &&
+          prev_node->user_data == MODE_APPEND)) {
+
+      new_child_node =
+          create_md_node(NODE_PARAGRAPH, line_number, line_number, -1, -1);
+      append_to_root(root, new_child_node);
+      // make the new paragraph node the prev_node
+      prev_node = new_child_node;
+    }
+    // create a new paragraph and then set it to mode append
+    // we will append new stuff
+    prev_node->end_line = line_number;
+    new_child_node =
+        create_md_node(NODE_TEXT, line_number, line_number, 0, line_length);
+    set_text_data(new_child_node, line, line_length, line_number);
+    // check if we need add an extra space in front of the text data
+    // if there is another text node then we need to add a space infront
+    if (prev_node->last_child != NULL) {
+      add_space_infront(new_child_node);
+    }
+    append_to_root(root->last_child, new_child_node);
+    parse_new_paragraph_line(prev_node);
+  } else if (current_line_type == LINE_LISTITEM) {
+  } else {
+    printf("Line %d: Ignoring line %s, unknown\n", line_number,
+           print_line_type(current_line_type));
+  }
+}
+
 md_node *parse_source(char *file_name) {
 
   char *file_contents = read_source_code(file_name);
@@ -66,12 +180,9 @@ md_node *parse_source(char *file_name) {
   char *line = (char *)calloc(line_size, sizeof(char));
   char *ptr = file_contents;
   char *start = file_contents;
-  LineType current_line_type;
-  NodeType prev_node_type;
-  md_node *prev_node;
-  md_node *new_child_node;
 
-  while ((ptr = strstr(ptr, "\n")) != NULL) {
+  while ((ptr = strstr(ptr, "\n")) != NULL ||
+         ((ptr = strstr(ptr, "\0")) != NULL)) {
     line_length = ptr - start;
     // perform realloc if not sufficient length
     if (line_size < line_length) {
@@ -84,105 +195,7 @@ md_node *parse_source(char *file_name) {
     strncpy(line, start, line_length);
     line[line_length] = '\0';
 
-    // we get the line type first
-    current_line_type = get_line_type(line, line_length);
-
-    // now we want to figure out how it fits in the Tree
-    // First we check what the last node is
-    if (root->last_child == NULL) {
-      prev_node_type = NODE_NONE;
-    } else {
-      prev_node_type = root->last_child->type;
-    }
-    prev_node = root->last_child;
-
-    // Now we want to figure out how does this line fit in the Tree
-    printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
-           print_line_type(current_line_type), print_node_type(prev_node_type));
-    printf("Line %d data: %s\n", line_number, line);
-
-    if (prev_node_type == NODE_CODE_BLOCK &&
-        prev_node->user_data == MODE_APPEND) {
-
-      // if the line is a delimiter
-      if (current_line_type == LINE_CODE_DELIM) {
-        // we terminate the current prev_node
-        printf("ending code block\n");
-        collate_children_text(prev_node);
-        prev_node->end_line = line_number;
-        prev_node->user_data = MODE_PROCESSED;
-      } else {
-        prev_node->end_line = line_number;
-        new_child_node =
-            create_md_node(NODE_TEXT, line_number, line_number, 0, line_length);
-        set_text_data(new_child_node, line, line_length, line_number);
-        append_to_root(root->last_child, new_child_node);
-      }
-    } else if (current_line_type == LINE_CODE_DELIM) {
-
-      // so if the previous node is not in append mode, we should jump here
-      // and create the new code block
-      new_child_node =
-          create_md_node(NODE_CODE_BLOCK, line_number, line_number, -1, -1);
-      set_code_language(new_child_node, line, line_length);
-      append_to_root(root, new_child_node);
-    } else if (current_line_type == LINE_HEADER) {
-      // if it is a header
-      // it doesn't matter what the last node is
-      // we will just mark previous node as processed.
-      prev_node->user_data = MODE_PROCESSED;
-      new_child_node =
-          create_md_node(NODE_HEADING, line_number, line_number, -1, -1);
-      new_child_node->user_data = MODE_PROCESSED;
-      set_header_data(new_child_node, line, line_length);
-      append_to_root(root, new_child_node);
-    } else if (current_line_type == LINE_IMAGE) {
-
-      prev_node->user_data = MODE_PROCESSED;
-      new_child_node =
-          create_md_node(NODE_IMAGE, line_number, line_number, -1, -1);
-      new_child_node->user_data = MODE_PROCESSED;
-      set_image_link(new_child_node, line, line_length);
-      set_image_caption(new_child_node, line, line_length);
-      append_to_root(root, new_child_node);
-    } else if (current_line_type == LINE_EMPTY) {
-
-      // helps terminate the previous paragraph if necessary
-      if (prev_node_type == NODE_PARAGRAPH &&
-          prev_node->user_data == MODE_APPEND) {
-        prev_node->user_data = MODE_PROCESSED;
-      }
-    } else if (current_line_type == LINE_TEXT) {
-      // if previous node is not a appending paragraph,
-      // we need to create a new appending paragraph
-      if (!(prev_node_type == NODE_PARAGRAPH &&
-            prev_node->user_data == MODE_APPEND)) {
-
-        new_child_node =
-            create_md_node(NODE_PARAGRAPH, line_number, line_number, -1, -1);
-        append_to_root(root, new_child_node);
-        // make the new paragraph node the prev_node
-        prev_node = new_child_node;
-      }
-      // create a new paragraph and then set it to mode append
-      // we will append new stuff
-      prev_node->end_line = line_number;
-      new_child_node =
-          create_md_node(NODE_TEXT, line_number, line_number, 0, line_length);
-      set_text_data(new_child_node, line, line_length, line_number);
-      // check if we need add an extra space in front of the text data
-      // if there is another text node then we need to add a space infront
-      if (prev_node->last_child != NULL) {
-        add_space_infront(new_child_node);
-      }
-      append_to_root(root->last_child, new_child_node);
-      parse_new_paragraph_line(prev_node);
-    } else if (current_line_type == LINE_LISTITEM) {
-    } else {
-      printf("Line %d: Ignoring line %s, unknown\n", line_number,
-             print_line_type(current_line_type));
-    }
-
+    parse_line(root, line, line_length, line_number);
     // terminating stuff
     line_number++;
     char_so_far += (line_length + 1);
@@ -201,6 +214,7 @@ md_node *parse_source(char *file_name) {
 
   strncpy(line, start, line_length);
   line[line_length] = '\0';
+  parse_line(root, line, line_length, line_number);
   line_number++;
   line_length = 0;
   start = ptr;

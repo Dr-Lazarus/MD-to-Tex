@@ -56,11 +56,16 @@ $1 + 1 = 2$
 test _bold_ [link](e.com) tet
 
 ![caption](image.png)
+$$
+1 + 1
+$$
 
+$$
 ```
 test
 tickles
 
 foo
 ```
+$$
 
