@@ -3,36 +3,45 @@
 #include <stdio.h>
 #include <string.h>
 
-int is_header(const char *line, int line_length) {
+int is_header(const char *line, int line_length)
+{
   // check if its a header,
   regex_t header_regex;
   int value;
   // Creation of regEx
   // we are opinionated and need the space
   value = regcomp(&header_regex, "^(#{1,6} .+)", REG_EXTENDED);
-  if (value != 0) {
+  if (value != 0)
+  {
     printf("regex didn't compile");
   }
   value = regexec(&header_regex, line, 0, NULL, 0);
   return value == 0;
 }
 
-int get_header_level(const char *line, int line_length) {
+int get_header_level(const char *line, int line_length)
+{
   int c = 0;
-  if (line[0] != '#') {
+  if (line[0] != '#')
+  {
     return -1;
   }
-  for (int i = 0; i < line_length; i++) {
-    if (line[i] == '#') {
+  for (int i = 0; i < line_length; i++)
+  {
+    if (line[i] == '#')
+    {
       c++;
-    } else {
+    }
+    else
+    {
       return c;
     }
   }
   return -1;
 }
 
-void set_header_data(md_node *node, const char *line, int line_length) {
+void set_header_data(md_node *node, const char *line, int line_length)
+{
 
   node->heading_level = get_header_level(line, line_length);
 
