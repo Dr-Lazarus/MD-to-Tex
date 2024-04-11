@@ -99,6 +99,7 @@ md_node *parse_source(char *file_name) {
     // Now we want to figure out how does this line fit in the Tree
     printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
            print_line_type(current_line_type), print_node_type(prev_node_type));
+    printf("Line %d data: %s\n", line_number, line);
 
     if (prev_node_type == NODE_CODE_BLOCK &&
         prev_node->user_data == MODE_APPEND) {
@@ -106,7 +107,7 @@ md_node *parse_source(char *file_name) {
       // if the line is a delimiter
       if (current_line_type == LINE_CODE_DELIM) {
         // we terminate the current prev_node
-        printf("ending code bloc\n");
+        printf("ending code block\n");
         collate_children_text(prev_node);
         prev_node->end_line = line_number;
         prev_node->user_data = MODE_PROCESSED;
@@ -125,7 +126,6 @@ md_node *parse_source(char *file_name) {
           create_md_node(NODE_CODE_BLOCK, line_number, line_number, -1, -1);
       set_code_language(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
-
     } else if (current_line_type == LINE_HEADER) {
       // if it is a header
       // it doesn't matter what the last node is
@@ -136,7 +136,6 @@ md_node *parse_source(char *file_name) {
       new_child_node->user_data = MODE_PROCESSED;
       set_header_data(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
-
     } else if (current_line_type == LINE_IMAGE) {
 
       prev_node->user_data = MODE_PROCESSED;
@@ -146,7 +145,6 @@ md_node *parse_source(char *file_name) {
       set_image_link(new_child_node, line, line_length);
       set_image_caption(new_child_node, line, line_length);
       append_to_root(root, new_child_node);
-
     } else if (current_line_type == LINE_EMPTY) {
 
       // helps terminate the previous paragraph if necessary
@@ -154,7 +152,6 @@ md_node *parse_source(char *file_name) {
           prev_node->user_data == MODE_APPEND) {
         prev_node->user_data = MODE_PROCESSED;
       }
-
     } else if (current_line_type == LINE_TEXT) {
       // if previous node is not a appending paragraph,
       // we need to create a new appending paragraph
@@ -181,7 +178,6 @@ md_node *parse_source(char *file_name) {
       append_to_root(root->last_child, new_child_node);
       parse_new_paragraph_line(prev_node);
     } else if (current_line_type == LINE_LISTITEM) {
-
     } else {
       printf("Line %d: Ignoring line %s, unknown\n", line_number,
              print_line_type(current_line_type));

@@ -21,13 +21,25 @@ same paragraph
 
 test *bold* test
 
+test **bold** test
+test ___bold___ test
+test ___bold__ test
+
+test no match *ag
+
 test *bold 3*
 
 *bold 4* test
 
+***test ***what *
+
+$1 + 1 = 2$
+
 *bold 2*
 
 \_bold\*
+
+`random code``` wetwt
 
 [link](www.test.com)
 

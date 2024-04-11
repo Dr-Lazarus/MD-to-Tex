@@ -35,6 +35,9 @@ void traverse_ast(md_node *root, FILE *output) {
       case NODE_EMPH:
         convert_emph(node, output, entering);
         break;
+      case NODE_MATH:
+        convert_math(node, output, entering);
+        break;
       case NODE_HEADING:
         convert_heading(node, output, entering);
         break;
@@ -218,10 +221,7 @@ void convert_code_block(md_node *node, FILE *output, int entering) {
  * the typewriter font style.
  */
 void convert_code(md_node *node, FILE *output, int entering) {
-  if (entering) {
-    const char *code_text = md_node_get_literal(node);
-    fprintf(output, "\\texttt{%s}", code_text ? code_text : "");
-  }
+  fprintf(output, entering ? "\\texttt{" : "}");
 }
 
 /*
@@ -229,6 +229,10 @@ void convert_code(md_node *node, FILE *output, int entering) {
  */
 void convert_strong(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\textbf{" : "}");
+}
+
+void convert_math(md_node *node, FILE *output, int entering) {
+  fprintf(output, "$");
 }
 
 /*

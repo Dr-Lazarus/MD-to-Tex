@@ -32,6 +32,31 @@ void append_to_root(md_node *root, md_node *new_child) {
   }
 }
 
+md_node *remove_last_child(md_node *node) {
+  if (node->last_child == NULL) {
+    return NULL;
+  }
+
+  md_node *result_node;
+  result_node = node->last_child;
+  result_node->parent = NULL;
+
+  if (result_node->prev == NULL) {
+
+    node->first_child = NULL;
+    node->last_child = NULL;
+
+  } else {
+
+    node->last_child = result_node->prev;
+    node->last_child->next = NULL;
+    result_node->prev = NULL;
+    node->end_line = node->last_child->end_line;
+  }
+
+  return result_node;
+}
+
 void link_children(md_node *dest, md_node *source) {
   dest->last_child->next = source->first_child;
   source->first_child->prev = dest->last_child;
