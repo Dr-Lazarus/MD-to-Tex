@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// defined by the recommended line length for markdown
+/* 
+ * Defined by the recommended line length for markdown.
+ */
 #define MAX_LINE_LENGTH 121
 #define INDENTATION 2
 

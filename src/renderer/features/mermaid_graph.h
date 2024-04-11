@@ -13,7 +13,7 @@ typedef struct {
 } Edge;
 
 typedef struct {
-    int x, y; // Coordinates for the node
+    int x, y;
 } Position;
 
 typedef struct {

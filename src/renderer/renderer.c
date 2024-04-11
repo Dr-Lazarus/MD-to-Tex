@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
+/* 
+ * Traverses the abstract syntax tree (AST) starting from the root node
+ * and converts it into LaTeX format by calling specific conversion functions
+ * based on the node type. The traversal is done using an iterator.
+ */
 void traverse_ast(md_node *root, FILE *output) {
   iter_event_type ev_type;
   md_iter *iter = md_iter_new(root);
@@ -77,16 +82,23 @@ void traverse_ast(md_node *root, FILE *output) {
   }
 }
 
+/* 
+ * Converts a paragraph node into LaTeX. Ensures a blank line is inserted
+ * at the end of a paragraph for proper formatting.
+ */
 void convert_paragraph(md_node *node, FILE *output, int entering) {
   if (!entering) {
-    fprintf(output, "\n\n"); // Ensure a blank line at the end of a paragraph
+    fprintf(output, "\n\n");
   }
 }
 
+/* 
+ * Converts a text node into LaTeX, performing necessary escaping
+ * for special LaTeX characters within the text.
+ */
 void convert_text(md_node *node, FILE *output, int entering) {
   if (entering) {
     const char *text = md_node_get_literal(node);
-    // Assuming a simplified version of latex escaping for demonstration
     while (*text) {
       switch (*text) {
       case '\\':
@@ -101,7 +113,6 @@ void convert_text(md_node *node, FILE *output, int entering) {
       case '$':
         fprintf(output, "\\$");
         break;
-      // Add cases for other special characters here...
       default:
         fputc(*text, output);
         break;
@@ -111,14 +122,22 @@ void convert_text(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Wraps the content of an emphasis node with LaTeX emphasis formatting.
+ */
 void convert_emph(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\emph{" : "}");
 }
 
+/* 
+ * Converts a heading node into the appropriate LaTeX sectioning command
+ * based on the heading level.
+ */
 void convert_heading(md_node *node, FILE *output, int entering) {
+  int level;
+
   fprintf(output, entering ? "\\emph{" : "}");
-  int level = md_node_get_heading_level(node);
-  // Format the heading based on its level into LaTeX.
+  level = md_node_get_heading_level(node);
   switch (level) {
   case 1:
     fprintf(output, entering ? "\\section{" : "}\n");
@@ -136,12 +155,15 @@ void convert_heading(md_node *node, FILE *output, int entering) {
     fprintf(output, entering ? "\\subparagraph{" : "}\n");
     break;
   default:
-    // Handle unexpected heading levels, if any.
     fprintf(output, entering ? "\\paragraph{" : "}\n");
     break;
   }
 }
 
+/* 
+ * Starts a LaTeX list environment (itemize or enumerate) when entering
+ * a list node and ends it when exiting.
+ */
 void convert_list(md_node *node, FILE *output, int entering) {
   ListType list_type = md_node_get_list_type(node);
   if (entering) {
@@ -153,16 +175,20 @@ void convert_list(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Converts an item node into a LaTeX item. It is used within list environments.
+ */
 void convert_item(md_node *node, FILE *output, int entering) {
   if (entering) {
-    // Directly start items without a leading paragraph command
     fprintf(output, "\\item ");
   } else {
     fprintf(output, "\n");
   }
-  // No else case needed as items don't need explicit closing in LaTeX
 }
 
+/* 
+ * Wraps the content of a blockquote node with LaTeX quote environment.
+ */
 void convert_blockquote(md_node *node, FILE *output, int entering) {
   if (entering) {
     fprintf(output, "\\begin{quote}");
@@ -171,6 +197,10 @@ void convert_blockquote(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Encloses a code block node content within a LaTeX verbatim environment
+ * to preserve formatting and special characters.
+ */
 void convert_code_block(md_node *node, FILE *output, int entering) {
   if (entering) {
     fprintf(output, "\n\\begin{verbatim}\n");
@@ -179,26 +209,42 @@ void convert_code_block(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Converts a code node into LaTeX using the texttt command to preserve
+ * the typewriter font style.
+ */
 void convert_code(md_node *node, FILE *output, int entering) {
   if (entering) {
-    // Fetch the code text and wrap it in \texttt
     const char *code_text = md_node_get_literal(node);
     fprintf(output, "\\texttt{%s}", code_text ? code_text : "");
   }
 }
 
+/* 
+ * Wraps the content of a strong emphasis node with LaTeX bold formatting.
+ */
 void convert_strong(md_node *node, FILE *output, int entering) {
   fprintf(output, entering ? "\\textbf{" : "}");
 }
 
+/* 
+ * Converts a softbreak node into a space in LaTeX. Softbreaks represent
+ * spaces or soft line breaks in the source markdown.
+ */
 void convert_softbreak(md_node *node, FILE *output, int entering) {
-  fprintf(output, " "); // Softbreaks can be converted to spaces
+  fprintf(output, " ");
 }
 
+/* 
+ * Converts a linebreak node into a forced newline in LaTeX using the newline command.
+ */
 void convert_linebreak(md_node *node, FILE *output, int entering) {
-  fprintf(output, "\\newline\n"); // Force a new line in LaTeX
+  fprintf(output, "\\newline\n"); 
 }
 
+/* 
+ * Converts a link node into LaTeX hyperref format, making the link clickable.
+ */
 void convert_link(md_node *node, FILE *output, int entering) {
   if (entering) {
     const char *url = md_node_get_url(node);
@@ -208,6 +254,10 @@ void convert_link(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Converts an image node into LaTeX figure environment, using includegraphics
+ * for the image and caption for the alternative text.
+ */
 void convert_image(md_node *node, FILE *output, int entering) {
   if (entering) {
     const char *url = md_node_get_url(node);
@@ -219,11 +269,17 @@ void convert_image(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Identifies the type of Mermaid diagram in a node and calls the appropriate
+ * conversion function for Mermaid diagrams to LaTeX.
+ */
 void convert_mermaid_diagram(md_node *node, FILE *output, int entering) {
+  const char* mermaid_code;
+
   if (!entering)
     return;
 
-  const char* mermaid_code = md_node_get_mermaid_code(node);
+  mermaid_code = md_node_get_mermaid_code(node);
   if (!mermaid_code) return;
 
   if (strstr(mermaid_code, "classDiagram") != NULL) {
@@ -235,8 +291,15 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering) {
   }
 }
 
+/* 
+ * Converts a Mermaid sequence diagram into LaTeX.
+ */
 void convert_sequence_diagram(const char* mermaid_code, FILE* output) {}
 
+/* 
+ * Parses and converts a Mermaid class diagram into LaTeX, generating a
+ * class diagram using LaTeX commands based on the parsed structure.
+ */
 void convert_class_diagram(const char* mermaid_code, FILE* output) {
   ClassNode classNodes[MAX_CLASSES];
   ClassRelationship relationships[MAX_RELATIONSHIPS];
@@ -246,21 +309,24 @@ void convert_class_diagram(const char* mermaid_code, FILE* output) {
   generate_latex_class_diagram(classNodes, classCount, relationships, relCount, output);
 }
 
+/* 
+ * Parses and converts a Mermaid graph diagram into LaTeX, generating a
+ * graph layout using LaTeX commands based on the parsed structure.
+ */
 void convert_graph_diagram(const char* mermaid_code, FILE *output) {
   char node_list[MAX_NODES] = {0};
   Edge edge_list[MAX_EDGES];
   int edge_count = 0;
-  Position positions[MAX_NODES]; // For each node
+  int i;
+  Position positions[MAX_NODES]; 
 
-  // This updates node_list and edge_list
   parse_graph_mermaid_code(mermaid_code, node_list, edge_list, &edge_count);
 
   printf("Node List: %s\n", node_list);
-  for (int i = 0; i < edge_count; i++) {
+  for (i = 0; i < edge_count; i++) {
     printf("Edge: %c -> %c\n", edge_list[i].fromNode, edge_list[i].toNode);
   }
 
-  // This calculates the layout of the nodes
   calculate_layout(node_list, edge_list, edge_count, positions);
   generate_latex_graph(node_list, positions, edge_list, edge_count, output);
 }
