@@ -1,14 +1,28 @@
 \documentclass{article}
+\usepackage{tikz}
+\usepackage{pgf-pie}
+\usepackage{pgf-umlsd}
 \begin{document}
-	random
+random
 
 \emph{\section{header 1}}
 test words
 
 \emph{\subsection{Test Case 7: Wide Tree Structure}}
 \begin{tikzpicture}[>=stealth]
+\node (A) at (0, 2) {A};
+\node (B) at (2, 10) {B};
+\node (C) at (2, 8) {C};
+\node (D) at (2, 6) {D};
+\node (E) at (2, 4) {E};
+\node (F) at (2, 2) {F};
+\draw[->] (A) -- (B);
+\draw[->] (A) -- (C);
+\draw[->] (A) -- (D);
+\draw[->] (A) -- (E);
+\draw[->] (A) -- (F);
 \end{tikzpicture}
-    A-->C;    A-->D;    A-->E;    A-->F;same paragraph
+more words same paragraph
 
 test *bold* test
 
@@ -24,10 +38,12 @@ test *bold 3*
 
 test _bold_ [link](e.com) tet
 
-![caption](image.png)
-
+\begin{figure}[h]\centering\includegraphics{image.png}\caption{caption}\end{figure}
 
 \begin{verbatim}
-testticklesfoo
+test
+tickles
+
+foo
 \end{verbatim}
 \end{document}

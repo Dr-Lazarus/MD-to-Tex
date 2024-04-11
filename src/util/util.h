@@ -7,5 +7,5 @@
 #include "../tree.h"
 #endif
 
-void add_text_data(md_node *node, const char *line, int line_length,
-                   char delim);
+void collate_children_text(md_node *node);
+void add_space_infront(md_node *node);

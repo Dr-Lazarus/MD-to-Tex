@@ -14,7 +14,11 @@
  * - relationships: An array to be populated with the relationships between class nodes.
  * - relationshipCount: A pointer to an integer to hold the count of relationships parsed.
  */
-void parse_class_diagram_mermaid_code(const char* mermaidCode, ClassNode* classNodes, int* classNodeCount, ClassRelationship* relationships, int* relationshipCount) {}
+void parse_class_diagram_mermaid_code(const char *mermaidCode,
+                                      ClassNode *classNodes,
+                                      int *classNodeCount,
+                                      ClassRelationship *relationships,
+                                      int *relationshipCount) {}
 
 /* 
  * Generates a LaTeX representation of a class diagram, using TikZ for drawing.
@@ -27,18 +31,18 @@ void parse_class_diagram_mermaid_code(const char* mermaidCode, ClassNode* classN
  * - relationshipCount: The number of relationships in the relationships array.
  * - output: A file stream to write the generated LaTeX code to.
  */
-void generate_latex_class_diagram(const ClassNode* classNodes, int classNodeCount, const ClassRelationship* relationships, int relationshipCount, FILE* output) {
+void generate_latex_class_diagram(const ClassNode *classNodes,
+                                  int classNodeCount,
+                                  const ClassRelationship *relationships,
+                                  int relationshipCount, FILE *output) {
   int i;
 
   fprintf(output, "\\begin{tikzpicture}[>=stealth]\n");
 
-  for (i = 0; i < classNodeCount; i++) {
-      fprintf(output, "");
-  }
-
   for (i = 0; i < relationshipCount; i++) {
-      fprintf(output, "\\draw (%s) -- (%s) node[midway, fill=white] {%s};\n",
-              relationships[i].fromId, relationships[i].toId, relationships[i].label);
+    fprintf(output, "\\draw (%s) -- (%s) node[midway, fill=white] {%s};\n",
+            relationships[i].fromId, relationships[i].toId,
+            relationships[i].label);
   }
 
   fprintf(output, "\\end{tikzpicture}\n");

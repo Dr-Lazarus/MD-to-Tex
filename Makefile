@@ -1,6 +1,6 @@
-CFLAGS = -Wall -Werror -ansi -pedantic
-# CFLAGS = -Wall -Werror
-OFILES = main.o parser.o tree.o codeblock.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o cvector.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o mermaid_pie.o
+# CFLAGS = -Wall -Werror -ansi -pedantic
+CFLAGS = -Wall -Werror
+OFILES = main.o parser.o tree.o codeblock.o mathblock.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o cvector.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o mermaid_pie.o
 
 main: $(OFILES)
 	gcc $(OFILES) -o md_to_tex $(CFLAGS)
