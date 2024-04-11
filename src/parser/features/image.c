@@ -8,7 +8,7 @@ int is_image_link(const char *line, int line_length) {
   int value;
   // Creation of regEx
   // we are opinionated and need the space
-  value = regcomp(&image_regex, "^!\\[(.*)\\]\\((.+)\\)$", REG_EXTENDED);
+  value = regcomp(&image_regex, "^!\\[(.*)\\]\\((.+)\\)\n$", REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
   }

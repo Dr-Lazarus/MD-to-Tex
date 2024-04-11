@@ -46,7 +46,10 @@ void set_header_data(md_node *node, const char *line, int line_length)
   node->heading_level = get_header_level(line, line_length);
 
   int heading_data_length = line_length - node->heading_level;
-  md_node *text_node = create_empty_md_node(NODE_TEXT);
+  md_node *text_node = create_md_node(
+      NODE_TEXT, node->start_line, node->end_line,
+      node->start_column + node->heading_level + 1, node->end_column);
+
   text_node->data = (char *)calloc(heading_data_length, sizeof(char));
   text_node->len = heading_data_length;
   line += (node->heading_level + 1);

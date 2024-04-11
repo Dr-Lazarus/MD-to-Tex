@@ -1,10 +1,6 @@
 #include "tree.h"
 
-md_node *init_tree()
-{
-  return create_md_node(NODE_ROOT, "root", 4, NULL, NULL, NULL, NULL, NULL,
-                        MODE_EMPTY);
-}
+md_node *init_tree() { return create_md_node(NODE_ROOT, -1, -1, -1, -1); }
 
 void print_tree_data(md_node *node, int indent_level)
 {

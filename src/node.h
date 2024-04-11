@@ -33,7 +33,8 @@ typedef enum {
   NODE_THEMATICBREAK,
   NODE_SOFTBREAK,
   NODE_LINEBREAK,
-  NODE_MERMAID_DIAGRAM
+  NODE_MERMAID_DIAGRAM,
+  NODE_NONE
 } NodeType;
 
 typedef enum { LIST_BULLET, LIST_NUMBERED } ListType;
@@ -52,7 +53,7 @@ typedef enum {
 
 typedef enum {
   MODE_EMPTY,
-  MODE_APPENDPARA,
+  MODE_APPEND,
   MODE_STARTNEW,
   MODE_NONE,
   MODE_CODE,
@@ -93,11 +94,12 @@ void print_node(md_node *node, int indent_level);
 
 void print_type(md_node *node, int indent_level);
 
-md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
-                        md_node *prev, md_node *parent, md_node *first_child,
-                        md_node *last_child, Mode user_data);
+md_node *create_md_node(NodeType type, int start_line, int end_line,
+                        int start_column, int end_column);
 
-md_node *create_empty_md_node(NodeType type);
+char *print_line_type(LineType type);
+char *print_node_type(NodeType type);
+md_node *create_empty_md_node(NodeType type, int start_line, int end_line);
 
 NodeType md_node_get_type(md_node *node);
 char *md_node_get_fence_info(md_node *node);

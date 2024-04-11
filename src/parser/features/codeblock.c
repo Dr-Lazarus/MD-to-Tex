@@ -26,7 +26,6 @@ void set_code_language(md_node *current_node, const char *line,
   strncpy(current_node->code_language, line, line_length - 2);
 }
 
-void set_code_data(md_node *node, const char *line, int line_length)
-{
-  add_text_data(node, line, line_length, '\n');
-}
+// void set_code_data(md_node *node, const char *line, int line_length) {
+//   add_text_data(node, line, line_length, '\n');
+// }

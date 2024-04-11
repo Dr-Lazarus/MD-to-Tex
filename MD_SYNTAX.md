@@ -74,6 +74,8 @@ Blockquotes are supported same as in conventional markdown
 
 For all lists, the symbol that we are looking for will be at the start of the new line
 
+indentation is only 2 spaces.
+
 ### Ordered
 
 ```

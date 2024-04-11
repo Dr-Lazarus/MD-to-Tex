@@ -64,7 +64,7 @@ void addNode(char *node_list, char node) {
  * - edge_count: A pointer to an integer to be updated with the count of edges found.
  */
 void parse_graph_mermaid_code(const char *mermaid_code, char *node_list,
-                        Edge *edge_list, int *edge_count) {
+                              Edge *edge_list, int *edge_count) {
   char line[MAX_LINE_LENGTH];
   char fromNode[2] = {0}, toNode[2] = {0};
   *edge_count = 0;
@@ -161,7 +161,7 @@ void calculate_layout(char *node_list, Edge *edge_list, int edge_count,
  * - outputFile: A file stream where the generated LaTeX code is written.
  */
 void generate_latex_graph(char *node_list, Position *positions, Edge *edge_list,
-                    int edge_count, FILE *outputFile) {
+                          int edge_count, FILE *outputFile) {
   fprintf(outputFile, "\\begin{tikzpicture}[>=stealth]\n");
 
   for (int i = 0; node_list[i] != '\0'; i++) {
