@@ -83,9 +83,9 @@ void parse_line(md_node *root, const char *line, int line_length,
   prev_node = root->last_child;
 
   // Now we want to figure out how does this line fit in the Tree
-  printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
-         print_line_type(current_line_type), print_node_type(prev_node_type));
-  printf("Line %d data: %s\n", line_number, line);
+  // printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
+  //        print_line_type(current_line_type), print_node_type(prev_node_type));
+  // printf("Line %d data: %s\n", line_number, line);
 
   if ((prev_node_type == NODE_CODE_BLOCK ||
        prev_node_type == NODE_MATH_BLOCK) &&
@@ -260,20 +260,17 @@ void parse_line(md_node *root, const char *line, int line_length,
     delimiter[delimiter_length] = '\0';
     // we should do all the checks
     // first, we identify if the delimiter is correct
-    printf("delimiter: %s\n", delimiter);
     if (prev_node->last_child != NULL) {
       prev_list_item = prev_node->last_child;
       while (prev_list_item != NULL && prev_list_item->type != NODE_ITEM) {
         prev_list_item = prev_list_item->prev;
       }
-      // now we need to check the delimiter
-      printf("Checking previous node\n");
     } else {
       prev_list_item = NULL;
     }
 
-    printf("previous item is %p\n", prev_list_item);
-
+    // now we need to check the delimiter
+    // First we create it
     if (list_type == LIST_NUMBERED) {
       number_delim = (char *)calloc(delimiter_length, sizeof(char));
       strncpy(number_delim, delimiter, delimiter_length - 1);
@@ -287,12 +284,17 @@ void parse_line(md_node *root, const char *line, int line_length,
       list_number_delim = 0;
     }
 
+    // if the list types are not different
     if (list_type != prev_node->list_type) {
-      printf("Line %d: Do not mix list types together\n", line_number);
+      printf(
+          "Line %d: Do not mix list types together new line is %s while list "
+          "is %s\n",
+          line_number, list_type == LIST_NUMBERED ? "Numbered" : "Bullet",
+          prev_node->list_type == LIST_NUMBERED ? "Numbered" : "Bullet");
+
     } else {
       // check for consistency
       if (prev_list_item != NULL) {
-        printf("data is %s\n", prev_list_item->last_child->data);
         // now we need to check the delimiter;
         if (prev_node->list_type == LIST_BULLET) {
 
