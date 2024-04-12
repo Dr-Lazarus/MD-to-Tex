@@ -189,7 +189,7 @@ void parse_line(md_node *root, const char *line, int line_length,
           "Line %d: Inconsistent indentation with %d. Supposed to only be "
           "multiples of %d\n",
           line_number, indent, INDENT_SPACE);
-      abort();
+      exit(EXIT_FAILURE);
     }
 
     // if the last child was not a list
@@ -198,7 +198,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     if (prev_node != NULL && prev_node->type != NODE_LIST && indent != 0) {
       printf("Line %d: Not allowed to have nested list declared immediately\n",
              line_number);
-      abort();
+      exit(EXIT_FAILURE);
     }
 
     nested = indent / INDENT_SPACE;
@@ -216,7 +216,7 @@ void parse_line(md_node *root, const char *line, int line_length,
             "Line %d: Indentation level should only be incremental. Jumping \n"
             "from depth of %d to depth of %d is not allowed\n",
             line_number, i, nested);
-        abort();
+        exit(EXIT_FAILURE);
       }
     }
     // now we create the list node if the last node was not list

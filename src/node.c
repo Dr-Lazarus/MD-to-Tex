@@ -189,7 +189,7 @@ md_node *create_md_node(NodeType type, int start_line, int end_line,
 
   if (node == NULL) {
     printf("Failed to allocate memory for node %s", print_node_type(type));
-    abort();
+    exit(EXIT_FAILURE);
   }
 
   node->type = type;
