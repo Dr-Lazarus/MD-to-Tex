@@ -36,12 +36,14 @@
 
 
 #latex outputs
-.aux
-.fdb_latexmk
-.fls
-.log
-.synctex.gz
-.pdf
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz
+*.pdf
+*.tex
+
 
 md_to_tex
 test_folder/output
