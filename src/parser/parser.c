@@ -282,6 +282,9 @@ void parse_line(md_node *root, const char *line, int line_length,
       char_delim = delimiter[0];
       // in case
       list_number_delim = 0;
+    } else {
+      char_delim = ' ';
+      list_number_delim = 0;
     }
 
     // if the list types are not different
