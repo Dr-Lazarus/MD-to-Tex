@@ -17,8 +17,8 @@ typedef enum {
   NODE_MATH_BLOCK,
   NODE_DEFINITION,
   NODE_EMPH,
-  NODE_HEADING, // currently ok
-  NODE_HTML,    // we will not take this
+  NODE_HEADING,  // currently ok
+  NODE_HTML,     // we will not take this
   NODE_IMAGE,
   NODE_IMAGEREFERENCE,
   NODE_INLINECODE,
@@ -26,10 +26,10 @@ typedef enum {
   NODE_LINKREFERENCE,
   NODE_LIST,
   NODE_ITEM,
-  NODE_PARAGRAPH, // currently ok but not the details
-  NODE_ROOT,      // currently in use for root
+  NODE_PARAGRAPH,  // currently ok but not the details
+  NODE_ROOT,       // currently in use for root
   NODE_STRONG,
-  NODE_TEXT, // currently the only type of text
+  NODE_TEXT,  // currently the only type of text
   NODE_THEMATICBREAK,
   NODE_SOFTBREAK,
   NODE_LINEBREAK,
@@ -88,6 +88,8 @@ typedef struct md_node {
   char *title;
   int title_length;
   char *mermaid_code;
+  char delimiter;
+  int list_number;
 } md_node;
 
 void print_node(md_node *node, int indent_level);

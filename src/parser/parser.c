@@ -58,11 +58,16 @@ void parse_line(md_node *root, const char *line, int line_length,
 
   int i, indent, nested;
   LineType current_line_type;
+  ListType list_type;
   NodeType prev_node_type;
   md_node *prev_node;
   md_node *new_child_node;
   md_node *list_child;
+  md_node *prev_list_item;
   char *delimiter;
+  char *number_delim;
+  int list_number_delim;
+  char char_delim;
   int delimiter_length;
   int initial;
   // we get the line type first
@@ -216,6 +221,12 @@ void parse_line(md_node *root, const char *line, int line_length,
     }
     // now we create the list node if the last node was not list
     // we should also create if the previous list is in MODE_PROCESSED
+    // identify the type of list item first
+    if (line[indent] >= '0' && line[indent] <= '9') {
+      list_type = LIST_NUMBERED;
+    } else {
+      list_type = LIST_BULLET;
+    }
 
     if (list_child->last_child == NULL ||
         list_child->last_child->type != NODE_LIST ||
@@ -224,17 +235,14 @@ void parse_line(md_node *root, const char *line, int line_length,
       new_child_node = create_md_node(NODE_LIST, line_number, line_number, 0,
                                       line_length - 1);
       // we also identify what kind of list is it
-      if (line[indent] >= '0' && line[indent] <= '9') {
-        new_child_node->list_type = LIST_NUMBERED;
-      } else {
-        new_child_node->list_type = LIST_BULLET;
-      }
+      new_child_node->list_type = list_type;
 
       append_to_root(list_child, new_child_node);
       prev_node = new_child_node;
+    } else {
+      prev_node = list_child->last_child;
     }
 
-    printf("past the loop\n");
     // we should check all the other conditions for delimiter information
 
     // now we create the node itself with the data
@@ -253,12 +261,74 @@ void parse_line(md_node *root, const char *line, int line_length,
     // we should do all the checks
     // first, we identify if the delimiter is correct
     printf("delimiter: %s\n", delimiter);
+    if (prev_node->last_child != NULL) {
+      prev_list_item = prev_node->last_child;
+      while (prev_list_item != NULL && prev_list_item->type != NODE_ITEM) {
+        prev_list_item = prev_list_item->prev;
+      }
+      // now we need to check the delimiter
+      printf("Checking previous node\n");
+    } else {
+      prev_list_item = NULL;
+    }
+
+    printf("previous item is %p\n", prev_list_item);
+
+    if (list_type == LIST_NUMBERED) {
+      number_delim = (char *)calloc(delimiter_length, sizeof(char));
+      strncpy(number_delim, delimiter, delimiter_length - 1);
+      number_delim[delimiter_length - 1] = '\0';
+      list_number_delim = atoi(number_delim);
+      // this is in case;
+      char_delim = ' ';
+    } else if (list_type == LIST_BULLET) {
+      char_delim = delimiter[0];
+      // in case
+      list_number_delim = 0;
+    }
+
+    if (list_type != prev_node->list_type) {
+      printf("Line %d: Do not mix list types together\n", line_number);
+    } else {
+      // check for consistency
+      if (prev_list_item != NULL) {
+        printf("data is %s\n", prev_list_item->last_child->data);
+        // now we need to check the delimiter;
+        if (prev_node->list_type == LIST_BULLET) {
+
+          if (prev_list_item->delimiter != char_delim) {
+            printf(
+                "Line %d: Inconsistent delimiter for list (prev %c, next %c)\n",
+                line_number, prev_list_item->delimiter, delimiter[0]);
+          }
+        } else if (prev_node->list_type == LIST_NUMBERED) {
+
+          if (prev_list_item->list_number + 1 != list_number_delim) {
+            printf(
+                "Line %d: Inconsistent numbering of elements (prev %d, next "
+                "%d)\n",
+                line_number, prev_list_item->list_number, list_number_delim);
+          }
+        }
+      } else if (prev_list_item == NULL &&
+                 prev_node->list_type == LIST_NUMBERED) {
+        if (list_number_delim != 1) {
+          printf(
+              "Line %d: Numbered list does not start with 1 (currently %d)\n",
+              line_number, list_number_delim);
+        }
+      }
+    }
 
     // we then ignore the space
     indent++;
 
     new_child_node = create_md_node(NODE_ITEM, line_number, line_number, indent,
                                     line_length - 1);
+    // potentially messed up right now if the list type not compatible but it will be safe
+    new_child_node->list_number = list_number_delim;
+    new_child_node->delimiter = char_delim;
+
     append_to_root(prev_node, new_child_node);
     prev_node = new_child_node;
     new_child_node = create_md_node(NODE_TEXT, line_number, line_number, indent,
