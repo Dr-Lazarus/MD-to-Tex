@@ -34,6 +34,7 @@
 # Vscode
 .vscode/
 
+
 #latex outputs
 .aux
 .fdb_latexmk
@@ -43,3 +44,4 @@
 .pdf
 
 md_to_tex
+test_folder/output
