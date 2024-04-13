@@ -1,6 +1,6 @@
 # CFLAGS = -Wall -Werror -ansi -pedantic
 CFLAGS = -Wall -Werror
-OFILES = main.o parser.o tree.o codeblock.o mathblock.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o cvector.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o mermaid_pie.o
+OFILES = main.o parser.o tree.o codeblock.o mathblock.o blockquote.o headers.o paragraph.o image.o list.o node.o renderer.o iterator.o util.o cvector.o mermaid_graph.o mermaid_class_diagram.o mermaid_seq_diagram.o mermaid_pie.o
 
 main: $(OFILES)
 	gcc $(OFILES) -o md_to_tex $(CFLAGS)
@@ -34,6 +34,9 @@ mathblock.o: src/parser/features/mathblock.h src/parser/features/mathblock.c
 
 codeblock.o: src/parser/features/codeblock.h src/parser/features/codeblock.c
 	gcc -c src/parser/features/codeblock.c -o codeblock.o $(CFLAGS)
+
+blockquote.o: src/parser/features/blockquote.h src/parser/features/blockquote.c
+	gcc -c src/parser/features/blockquote.c -o blockquote.o $(CFLAGS)
 
 image.o: src/parser/features/image.h src/parser/features/image.c
 	gcc -c src/parser/features/image.c -o image.o $(CFLAGS)

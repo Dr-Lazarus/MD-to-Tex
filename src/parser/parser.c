@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "features/blockquote.h"
 #include "features/codeblock.h"
 #include "features/headers.h"
 #include "features/image.h"
@@ -46,6 +47,8 @@ LineType get_line_type(const char *line, int line_length) {
     return LINE_CODE_DELIM;
   } else if (is_image_link(line, line_length)) {
     return LINE_IMAGE;
+  } else if (is_blockquote(line, line_length)) {
+    return LINE_BLOCKQUOTE;
   } else if (is_list_item(line, line_length)) {
     return LINE_LISTITEM;
   } else {
@@ -65,6 +68,7 @@ void parse_line(md_node *root, const char *line, int line_length,
   md_node *prev_list_item;
   char *delimiter;
   char *number_delim;
+  char *blockquote_line;
   int list_number_delim;
   char char_delim;
   int delimiter_length;
@@ -157,8 +161,8 @@ void parse_line(md_node *root, const char *line, int line_length,
 
     // if previous node is not a appending paragraph,
     // we need to create a new appending paragraph
-    if (!(prev_node->type == NODE_PARAGRAPH &&
-          prev_node->user_data == MODE_APPEND)) {
+    if (prev_node == NULL || !(prev_node->type == NODE_PARAGRAPH &&
+                               prev_node->user_data == MODE_APPEND)) {
 
       new_child_node =
           create_md_node(NODE_PARAGRAPH, line_number, line_number, -1, -1);
@@ -179,6 +183,22 @@ void parse_line(md_node *root, const char *line, int line_length,
     }
     append_to_root(root->last_child, new_child_node);
     parse_new_paragraph_line(prev_node);
+
+  } else if (current_line_type == LINE_BLOCKQUOTE) {
+
+    if (prev_node == NULL || !(prev_node->type == NODE_BLOCK_QUOTE &&
+                               prev_node->user_data == MODE_APPEND)) {
+
+      new_child_node =
+          create_md_node(NODE_BLOCK_QUOTE, line_number, line_number, -1, -1);
+      append_to_root(root, new_child_node);
+      // make the new paragraph node the prev_node
+      prev_node = new_child_node;
+    }
+
+    blockquote_line = strip_blockquote(line, line_length);
+    parse_line(prev_node, blockquote_line, strlen(blockquote_line),
+               line_number);
 
   } else if (current_line_type == LINE_LISTITEM) {
 

@@ -89,8 +89,8 @@ char *print_line_type(LineType type) {
     case LINE_MATH_DELIM:
       return "LINE_MATH_DELIM";
       break;
-    case LINE_BLOCKTYPE:
-      return "LINE_BLOCKTYPE";
+    case LINE_BLOCKQUOTE:
+      return "LINE_BLOCKQUOTE";
       break;
     case LINE_TEXT:
       return "LINE_TEXT";

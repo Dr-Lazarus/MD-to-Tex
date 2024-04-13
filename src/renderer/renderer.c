@@ -201,7 +201,7 @@ void convert_item(md_node *node, FILE *output, int entering) {
  */
 void convert_blockquote(md_node *node, FILE *output, int entering) {
   if (entering) {
-    fprintf(output, "\\begin{quote}");
+    fprintf(output, "\\begin{quote}\n");
   } else {
     fprintf(output, "\\end{quote}\n");
   }
