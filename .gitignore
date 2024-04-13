@@ -34,6 +34,7 @@
 # Vscode
 .vscode/
 
+
 #latex outputs
 .aux
 .fdb_latexmk

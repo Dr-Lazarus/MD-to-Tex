@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{pgf-pie}
+\usepackage{pgf-umlsd}
+\begin{document}
+\emph{\subsubsection{Bello world}}
+\emph{\subsubsection{Test Case 1: Simple Sequence Diagram}}
+\begin{sequencediagram}
+  \newthread{0}{Alice}
+  \newinst[2]{1}{Bob}
+  \begin{messcall}{0}{Hi Bob}{1}
+  \end{messcall}
+  \begin{messcall}{1}{Hi Alice}{0}
+  \end{messcall}
+\end{sequencediagram}
+\emph{\subsubsection{Test Case 2: Sequence Diagram With More Participants}}
+\begin{sequencediagram}
+  \newthread{0}{Alice}
+  \newinst[2]{1}{Bob}
+  \newinst[2]{2}{Charlie}
+  \begin{messcall}{0}{Hi Bob}{1}
+  \end{messcall}
+  \begin{messcall}{1}{Hi Charlie}{2}
+  \end{messcall}
+  \begin{messcall}{2}{Hi Alice}{0}
+  \end{messcall}
+  \begin{call}{0}{I like talking to myself}{0}{}
+  \end{call}
+  \begin{call}{1}{Me too!}{1}{}
+  \end{call}
+\end{sequencediagram}
+\emph{\subsubsection{Test Case 3: Sequence Diagram With Implicit Participant Declaration}}
+\begin{sequencediagram}
+  \newthread{0}{Bob Charger}
+  \newinst[2]{1}{Alice Wex}
+  \newinst[2]{2}{Charlie Dugg}
+  \begin{messcall}{1}{Hi Bob Charger}{0}
+  \end{messcall}
+  \begin{messcall}{0}{Hi Charlie Dugg}{2}
+  \end{messcall}
+  \begin{messcall}{2}{Hi Alice Wex}{1}
+  \end{messcall}
+\end{sequencediagram}
+\emph{\subsubsection{Test Case 4: Prev test but with random white spaces in mermaid}}
+\begin{sequencediagram}
+  \newthread{0}{Bob Charger}
+  \newinst[2]{1}{Alice Wex}
+  \newinst[2]{2}{Charlie Dugg}
+  \begin{messcall}{1}{Hi Bob Charger}{0}
+  \end{messcall}
+  \begin{messcall}{0}{Hi Charlie Dugg}{2}
+  \end{messcall}
+  \begin{messcall}{2}{Hi Alice Wex}{1}
+  \end{messcall}
+\end{sequencediagram}
+\emph{\subsubsection{Test Case 5: Empty sequenceDiagram}}
+\begin{sequencediagram}
+\end{sequencediagram}
+\emph{\subsubsection{Test Case 6: Redeclare Participants}}
+\begin{sequencediagram}
+  \newthread{0}{Alice One}
+  \newinst[2]{1}{Alice Two}
+  \newinst[2]{2}{Bob}
+  \newinst[2]{3}{Charlie}
+  \begin{messcall}{0}{Hi Bob}{2}
+  \end{messcall}
+  \begin{messcall}{2}{Hi Charlie}{3}
+  \end{messcall}
+  \begin{messcall}{3}{Hi Alice Two}{1}
+  \end{messcall}
+\end{sequencediagram}
+\end{document}
