@@ -59,7 +59,6 @@ void parse_line(md_node *root, const char *line, int line_length,
   int i, indent, nested;
   LineType current_line_type;
   ListType list_type;
-  NodeType prev_node_type;
   md_node *prev_node;
   md_node *new_child_node;
   md_node *list_child;
@@ -75,26 +74,23 @@ void parse_line(md_node *root, const char *line, int line_length,
 
   // now we want to figure out how it fits in the Tree
   // First we check what the last node is
-  if (root->last_child == NULL) {
-    prev_node_type = NODE_NONE;
-  } else {
-    prev_node_type = root->last_child->type;
-  }
   prev_node = root->last_child;
 
   // Now we want to figure out how does this line fit in the Tree
-  // printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
-  //        print_line_type(current_line_type), print_node_type(prev_node_type));
-  // printf("Line %d data: %s\n", line_number, line);
+  printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
+         print_line_type(current_line_type),
+         prev_node == NULL ? NULL : print_node_type(prev_node->type));
+  printf("Line %d data: %s\n", line_number, line);
 
-  if ((prev_node_type == NODE_CODE_BLOCK ||
-       prev_node_type == NODE_MATH_BLOCK) &&
+  if (prev_node != NULL &&
+      (prev_node->type == NODE_CODE_BLOCK ||
+       prev_node->type == NODE_MATH_BLOCK) &&
       prev_node->user_data == MODE_APPEND) {
 
     // if the line is a delimiter
-    if ((prev_node_type == NODE_CODE_BLOCK &&
+    if ((prev_node->type == NODE_CODE_BLOCK &&
          current_line_type == LINE_CODE_DELIM) ||
-        (prev_node_type == NODE_MATH_BLOCK &&
+        (prev_node->type == NODE_MATH_BLOCK &&
          current_line_type == LINE_MATH_DELIM)) {
       // we terminate the current prev_node
       printf("ending block\n");
@@ -119,11 +115,16 @@ void parse_line(md_node *root, const char *line, int line_length,
                        line_number, line_number, -1, -1);
     set_code_language(new_child_node, line, line_length);
     append_to_root(root, new_child_node);
+
   } else if (current_line_type == LINE_HEADER) {
     // if it is a header
     // it doesn't matter what the last node is
     // we will just mark previous node as processed.
-    prev_node->user_data = MODE_PROCESSED;
+    if (prev_node != NULL) {
+      printf("process\n");
+      prev_node->user_data = MODE_PROCESSED;
+    }
+
     new_child_node =
         create_md_node(NODE_HEADING, line_number, line_number, -1, -1);
     new_child_node->user_data = MODE_PROCESSED;
@@ -132,7 +133,10 @@ void parse_line(md_node *root, const char *line, int line_length,
 
   } else if (current_line_type == LINE_IMAGE) {
 
-    prev_node->user_data = MODE_PROCESSED;
+    if (prev_node != NULL) {
+      prev_node->user_data = MODE_PROCESSED;
+    }
+
     new_child_node =
         create_md_node(NODE_IMAGE, line_number, line_number, -1, -1);
     new_child_node->user_data = MODE_PROCESSED;
@@ -143,7 +147,8 @@ void parse_line(md_node *root, const char *line, int line_length,
   } else if (current_line_type == LINE_EMPTY) {
 
     // helps terminate the previous paragraph if necessary
-    if ((prev_node_type == NODE_PARAGRAPH || prev_node_type == NODE_LIST) &&
+    if (prev_node != NULL &&
+        (prev_node->type == NODE_PARAGRAPH || prev_node->type == NODE_LIST) &&
         prev_node->user_data == MODE_APPEND) {
       prev_node->user_data = MODE_PROCESSED;
     }
@@ -152,7 +157,7 @@ void parse_line(md_node *root, const char *line, int line_length,
 
     // if previous node is not a appending paragraph,
     // we need to create a new appending paragraph
-    if (!(prev_node_type == NODE_PARAGRAPH &&
+    if (!(prev_node->type == NODE_PARAGRAPH &&
           prev_node->user_data == MODE_APPEND)) {
 
       new_child_node =
