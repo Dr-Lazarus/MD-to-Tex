@@ -303,18 +303,10 @@ void convert_mermaid_diagram(md_node *node, FILE *output, int entering) {
     convert_class_diagram(mermaid_code, output);
   } else if (strstr(mermaid_code, "sequenceDiagram") != NULL) {
     convert_sequence_diagram(mermaid_code, output);
+  } else if (strstr(mermaid_code, "pie title") != NULL) {
+    convert_pie_chart(mermaid_code, output);
   } else {
-    const char *mermaid_code = md_node_get_mermaid_code(node);
-    if (!mermaid_code)
-      return;
-
-    if (strstr(mermaid_code, "classDiagram") != NULL) {
-      convert_class_diagram(mermaid_code, output);
-    } else if (strstr(mermaid_code, "sequenceDiagram") != NULL) {
-      convert_sequence_diagram(mermaid_code, output);
-    } else {
-      convert_graph_diagram(mermaid_code, output);
-    }
+    convert_graph_diagram(mermaid_code, output);
   }
 }
 
