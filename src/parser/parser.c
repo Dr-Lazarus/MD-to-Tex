@@ -57,7 +57,7 @@ LineType get_line_type(const char *line, int line_length) {
 }
 
 void parse_line(md_node *root, const char *line, int line_length,
-                int line_number) {
+                int line_number, int debugging) {
 
   int i, indent, nested;
   LineType current_line_type;
@@ -81,10 +81,12 @@ void parse_line(md_node *root, const char *line, int line_length,
   prev_node = root->last_child;
 
   // Now we want to figure out how does this line fit in the Tree
-  printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
-         print_line_type(current_line_type),
-         prev_node == NULL ? NULL : print_node_type(prev_node->type));
-  printf("Line %d data: %s\n", line_number, line);
+  if (debugging) {
+    printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
+           print_line_type(current_line_type),
+           prev_node == NULL ? NULL : print_node_type(prev_node->type));
+    printf("Line %d data: %s\n", line_number, line);
+  }
 
   if (prev_node != NULL &&
       (prev_node->type == NODE_CODE_BLOCK ||
@@ -125,7 +127,6 @@ void parse_line(md_node *root, const char *line, int line_length,
     // it doesn't matter what the last node is
     // we will just mark previous node as processed.
     if (prev_node != NULL) {
-      printf("process\n");
       prev_node->user_data = MODE_PROCESSED;
     }
 
@@ -377,7 +378,7 @@ void parse_line(md_node *root, const char *line, int line_length,
   }
 }
 
-md_node *parse_source(char *file_name) {
+md_node *parse_source(char *file_name, int debugging) {
 
   char *file_contents = read_source_code(file_name);
 
@@ -404,7 +405,7 @@ md_node *parse_source(char *file_name) {
     strncpy(line, start, line_length);
     line[line_length] = '\0';
 
-    parse_line(root, line, line_length, line_number);
+    parse_line(root, line, line_length, line_number, debugging);
     // terminating stuff
     line_number++;
     char_so_far += (line_length + 1);
