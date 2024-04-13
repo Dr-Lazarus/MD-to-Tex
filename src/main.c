@@ -10,7 +10,7 @@
 #include "renderer/renderer.h"
 
 void printHelp() {
- printf("Usage: md_2_tex -i <inputfile.md> [-o <outputfile.tex>]\n");
+ printf("Usage: md_2_tex -i <inputfile> [-o <outputfile.tex>]\n");
  printf(
      "Convert Markdown files to LaTeX format by parsing the Markdown into an "
      "AST (Abstract Syntax Tree) and then rendering the LaTeX output.\n\n");
@@ -26,20 +26,27 @@ void printHelp() {
 int adjustOutputFilename(char **filename, const char *newExt) {
  char *dot = strrchr(*filename, '.');
  if (!dot) {
-  return 0;  // No extension found
+  size_t currentLen = strlen(*filename);
+  size_t newFilenameLen = currentLen + strlen(newExt) + 1;
+  char *newFilename = malloc(newFilenameLen);
+  if (!newFilename)
+   return 0;
+  snprintf(newFilename, newFilenameLen, "%s%s", *filename, newExt);
+  free(*filename);
+  *filename = newFilename;
+  return 1;
  }
+
  size_t baseLen = dot - *filename;
- size_t newFilenameLen =
-     baseLen + strlen(newExt) + 1;  // Include space for null terminator
+ size_t newFilenameLen = baseLen + strlen(newExt) + 1;
  char *newFilename = malloc(newFilenameLen);
  if (!newFilename)
-  return 0;  // Memory allocation failed
-
+  return 0;
  snprintf(newFilename, newFilenameLen, "%.*s%s", (int)baseLen, *filename,
           newExt);
  free(*filename);
  *filename = newFilename;
- return 1;  // Success
+ return 1;
 }
 
 int main(int argc, char **argv) {
@@ -59,12 +66,6 @@ int main(int argc, char **argv) {
   } else if (strcmp(argv[i], "-i") == 0) {
    if (i + 1 < argc) {
     inputFileName = strdup(argv[++i]);
-    if (!strcasestr(inputFileName,
-                    ".md")) {  // Case-insensitive check for .md extension
-     fprintf(stderr, "Error: Input file must have a .md or .MD extension\n");
-     free(inputFileName);
-     return EXIT_FAILURE;
-    }
    } else {
     fprintf(stderr, "Error: Input file name not specified!\n");
     return EXIT_FAILURE;
@@ -85,7 +86,6 @@ int main(int argc, char **argv) {
  }
 
  if (!outputFileName) {
-  // Create output file name based on input file name with .tex extension
   outputFileName = strdup(inputFileName);
   if (!adjustOutputFilename(&outputFileName, ".tex")) {
    fprintf(stderr, "Failed to set output file name\n");
