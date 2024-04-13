@@ -198,8 +198,8 @@ void parse_line(md_node *root, const char *line, int line_length,
     }
 
     blockquote_line = strip_blockquote(line, line_length);
-    parse_line(prev_node, blockquote_line, strlen(blockquote_line),
-               line_number);
+    parse_line(prev_node, blockquote_line, strlen(blockquote_line), line_number,
+               debugging);
 
   } else if (current_line_type == LINE_LISTITEM) {
 
@@ -424,7 +424,7 @@ md_node *parse_source(char *file_name, int debugging) {
 
   strncpy(line, start, line_length);
   line[line_length] = '\0';
-  parse_line(root, line, line_length, line_number);
+  parse_line(root, line, line_length, line_number, debugging);
   line_number++;
   line_length = 0;
   start = ptr;
