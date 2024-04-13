@@ -17,8 +17,8 @@ typedef enum {
   NODE_MATH_BLOCK,
   NODE_DEFINITION,
   NODE_EMPH,
-  NODE_HEADING, // currently ok
-  NODE_HTML,    // we will not take this
+  NODE_HEADING,  // currently ok
+  NODE_HTML,     // we will not take this
   NODE_IMAGE,
   NODE_IMAGEREFERENCE,
   NODE_INLINECODE,
@@ -26,14 +26,15 @@ typedef enum {
   NODE_LINKREFERENCE,
   NODE_LIST,
   NODE_ITEM,
-  NODE_PARAGRAPH, // currently ok but not the details
-  NODE_ROOT,      // currently in use for root
+  NODE_PARAGRAPH,  // currently ok but not the details
+  NODE_ROOT,       // currently in use for root
   NODE_STRONG,
-  NODE_TEXT, // currently the only type of text
+  NODE_TEXT,  // currently the only type of text
   NODE_THEMATICBREAK,
   NODE_SOFTBREAK,
   NODE_LINEBREAK,
-  NODE_MERMAID_DIAGRAM
+  NODE_MERMAID_DIAGRAM,
+  NODE_NONE
 } NodeType;
 
 typedef enum { LIST_BULLET, LIST_NUMBERED } ListType;
@@ -46,13 +47,14 @@ typedef enum {
   LINE_IMAGE,
   LINE_CODE_DELIM,
   LINE_MATH_DELIM,
+  LINE_BLOCKQUOTE,
   LINE_BLOCKTYPE,
   LINE_TEXT
 } LineType;
 
 typedef enum {
   MODE_EMPTY,
-  MODE_APPENDPARA,
+  MODE_APPEND,
   MODE_STARTNEW,
   MODE_NONE,
   MODE_CODE,
@@ -87,17 +89,20 @@ typedef struct md_node {
   char *title;
   int title_length;
   char *mermaid_code;
+  char delimiter;
+  int list_number;
 } md_node;
 
 void print_node(md_node *node, int indent_level);
 
 void print_type(md_node *node, int indent_level);
 
-md_node *create_md_node(NodeType type, char *data, int len, md_node *next,
-                        md_node *prev, md_node *parent, md_node *first_child,
-                        md_node *last_child, Mode user_data);
+md_node *create_md_node(NodeType type, int start_line, int end_line,
+                        int start_column, int end_column);
 
-md_node *create_empty_md_node(NodeType type);
+char *print_line_type(LineType type);
+char *print_node_type(NodeType type);
+md_node *create_empty_md_node(NodeType type, int start_line, int end_line);
 
 NodeType md_node_get_type(md_node *node);
 char *md_node_get_fence_info(md_node *node);

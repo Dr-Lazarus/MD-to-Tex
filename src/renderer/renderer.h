@@ -14,6 +14,8 @@ void convert_blockquote(md_node *node, FILE *output, int entering);
 void convert_code_block(md_node *node, FILE *output, int entering);
 void convert_code(md_node *node, FILE *output, int entering);
 void convert_strong(md_node *node, FILE *output, int entering);
+void convert_math(md_node *node, FILE *output, int entering);
+void convert_math_block(md_node *node, FILE *output, int entering);
 void convert_softbreak(md_node *node, FILE *output, int entering);
 void convert_linebreak(md_node *node, FILE *output, int entering);
 void convert_link(md_node *node, FILE *output, int entering);

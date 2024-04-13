@@ -37,15 +37,11 @@ void find_and_set_image(const char *line, int line_length, char **output,
   (*output)[*len] = '\0';
 }
 void set_image_link(md_node *node, const char *line, int line_length) {
-  printf("set image\n");
   find_and_set_image(line, line_length, &(node->url), &(node->url_length), '(',
                      ')');
-  printf("set image\n");
 }
 
 void set_image_caption(md_node *node, const char *line, int line_length) {
-  printf("set image\n");
   find_and_set_image(line, line_length, &(node->title), &(node->title_length),
                      '[', ']');
-  printf("set image\n");
 }

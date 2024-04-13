@@ -11,8 +11,12 @@
 #include "../../util/util.h"
 #endif
 
-void set_paragraph_data(md_node *node, const char *line, int line_length);
+void set_paragraph_data(md_node *node, const char *line, int line_length,
+                        int line_number);
 
 void process_paragraph_data(md_node *node);
 
-void set_text_data(md_node *node, const char *text, int text_length);
+void set_text_data(md_node *node, const char *text, int text_length,
+                   int line_number);
+
+void parse_new_paragraph_line(md_node *paragraph_node);

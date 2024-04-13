@@ -7,6 +7,8 @@
 #include "../../tree.h"
 #endif
 
+#define INDENT_SPACE 2
+
 int is_list_item(const char *line, int line_length);
 void set_item_data(md_node *node, const char *line, int line_length);
 void process_list_data(md_node *node);
