@@ -15,16 +15,15 @@ typedef enum {
   NODE_MATH,
   NODE_MATH_BLOCK,
   NODE_EMPH,
-  NODE_HEADING,  // currently ok
-  NODE_HTML,     // we will not take this
+  NODE_HEADING,
   NODE_IMAGE,
   NODE_LINK,
   NODE_LIST,
   NODE_ITEM,
-  NODE_PARAGRAPH,  // currently ok but not the details
-  NODE_ROOT,       // currently in use for root
+  NODE_PARAGRAPH,
+  NODE_ROOT,
   NODE_STRONG,
-  NODE_TEXT,  // currently the only type of text
+  NODE_TEXT,
   NODE_NONE
 } NodeType;
 
