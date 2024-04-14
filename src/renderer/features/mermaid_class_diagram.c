@@ -123,6 +123,9 @@ void calculate_class_layout(char *node_list, ClassEdge *edge_list, int edge_coun
  for (int i = 0; layoutNodes[i].id != '\0'; i++) {
   positions[i].x = layoutNodes[i].level * 5;
   positions[i].y = levelSizes[layoutNodes[i].level] * 5;
+  if (layoutNodes[i].level == -1) {
+   continue;
+  }
   levelSizes[layoutNodes[i].level]--;
  }
 }
