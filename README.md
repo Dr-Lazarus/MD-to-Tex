@@ -105,6 +105,8 @@ Replace `<input_file_name>` with the path to your Markdown file. The output will
 
 Tested on macOS, Linux, and Windows environments by our team, ensuring cross-platform reliability.
 
+Note: For class diagrams, please include `tikz-uml.sty` in tha main folder to render them properly.
+
 ## Authors
 
 - Yong Zhe Rui Gabriel
