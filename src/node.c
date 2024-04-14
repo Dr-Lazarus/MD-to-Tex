@@ -118,9 +118,6 @@ char *print_node_type(NodeType type) {
     case NODE_HEADING:
       return "NODE_HEADING";
       break;
-    case NODE_HTML:
-      return "NODE_HTML";
-      break;
     case NODE_IMAGE:
       return "NODE_IMAGE";
       break;
