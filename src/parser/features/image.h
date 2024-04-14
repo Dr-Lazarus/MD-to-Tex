@@ -6,6 +6,10 @@
 #define TREE_H
 #include "../../tree.h"
 #endif
+#ifndef UTIL_H
+#define UTIL_H
+#include "../../util/util.h"
+#endif
 
 int is_image_link(const char *line, int line_length);
 void set_image_link(md_node *node, const char *line, int line_length);

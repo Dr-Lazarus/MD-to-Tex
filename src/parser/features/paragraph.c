@@ -73,25 +73,6 @@ void copy_text_to_paragraph(md_node *paragraph_node, char *text, char *start,
   append_to_root(paragraph_node, new_child_node);
 }
 
-char *clean_escaped_characters(char *text, int text_length) {
-  char *result = (char *)calloc(text_length + 1, sizeof(char));
-  int i, j;
-
-  for (i = 0, j = 0; i < text_length; i++) {
-    if (i < text_length - 1 && text[i] == '\\') {
-      result[j] = text[i + 1];
-      i++;
-    } else {
-      result[j] = text[i];
-    }
-    j++;
-  }
-  result[j] = '\0';
-  result = (char *)realloc(result, (j + 1) * sizeof(char));
-
-  return result;
-}
-
 void parse_new_paragraph_line(md_node *paragraph_node) {
   // we take the last child
   md_node *aborted = remove_last_child(paragraph_node);
