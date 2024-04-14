@@ -330,14 +330,7 @@ void convert_sequence_diagram(const char *mermaid_code, FILE *output) {
  */
 
 void convert_class_diagram(const char *mermaid_code, FILE *output) {
-  ClassNode classNodes[MAX_CLASSES];
-  ClassRelationship relationships[MAX_RELATIONSHIPS];
-  int classCount = 0, relCount = 0;
-
-  parse_class_diagram_mermaid_code(mermaid_code, classNodes, &classCount,
-                                   relationships, &relCount);
-  generate_latex_class_diagram(classNodes, classCount, relationships, relCount,
-                               output);
+  parse_class_diagram_mermaid_code(mermaid_code, output);
 }
 
 void convert_pie_chart(const char *mermaid_code, FILE *output) {
