@@ -15,6 +15,10 @@
 r3r3RCX
 3CRAQRCX
 
+escape * \* * characters;
+
+[test \[](thml)
+
 >this is a blockquote
 >  # this is a header
 >> this is nested

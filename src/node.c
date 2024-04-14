@@ -74,9 +74,6 @@ char *print_line_type(LineType type) {
     case LINE_LISTITEM:
       return "LINE_LISTITEM";
       break;
-    case LINE_PARAGRAPH:
-      return "LINE_PARAGRAPH";
-      break;
     case LINE_HEADER:
       return "LINE_HEADER";
       break;

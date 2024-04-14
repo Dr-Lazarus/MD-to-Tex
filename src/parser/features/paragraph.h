@@ -14,6 +14,7 @@
 void set_paragraph_data(md_node *node, const char *line, int line_length,
                         int line_number);
 
+char *clean_escaped_characters(char *text, int text_length);
 void process_paragraph_data(md_node *node);
 
 void set_text_data(md_node *node, const char *text, int text_length,

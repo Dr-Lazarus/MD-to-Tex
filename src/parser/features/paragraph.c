@@ -1,5 +1,6 @@
 #include "paragraph.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void set_text_data(md_node *node, const char *text, int text_length,
@@ -44,7 +45,7 @@ char *identify_char(char *ptr, char *text, int text_length, char target) {
   int i;
   for (i = ptr - text; i < text_length; i++) {
     if (ptr[0] == '\\') {
-      ptr += 2;
+      ptr++;
     } else if (ptr[0] == target) {
       return ptr;
     }
@@ -66,7 +67,29 @@ void copy_text_to_paragraph(md_node *paragraph_node, char *text, char *start,
   new_child_node->data = (char *)calloc(new_child_node->len + 1, sizeof(char));
   strncpy(new_child_node->data, start, new_child_node->len);
   new_child_node->data[new_child_node->len] = '\0';
+  new_child_node->data =
+      clean_escaped_characters(new_child_node->data, new_child_node->len);
+  new_child_node->len = strlen(new_child_node->data);
   append_to_root(paragraph_node, new_child_node);
+}
+
+char *clean_escaped_characters(char *text, int text_length) {
+  char *result = (char *)calloc(text_length + 1, sizeof(char));
+  int i, j;
+
+  for (i = 0, j = 0; i < text_length; i++) {
+    if (i < text_length - 1 && text[i] == '\\') {
+      result[j] = text[i + 1];
+      i++;
+    } else {
+      result[j] = text[i];
+    }
+    j++;
+  }
+  result[j] = '\0';
+  result = (char *)realloc(result, (j + 1) * sizeof(char));
+
+  return result;
 }
 
 void parse_new_paragraph_line(md_node *paragraph_node) {
@@ -92,7 +115,6 @@ void parse_new_paragraph_line(md_node *paragraph_node) {
   char *ptr = text;
   char *start = text;
   char *end;
-  printf("identifying\n");
 
   while ((ptr = identify_special_char(ptr, text, text_length)) != NULL) {
     printf("Line %d: Identified special char %c at postion %ld\n",
@@ -185,11 +207,15 @@ void parse_new_paragraph_line(md_node *paragraph_node) {
         strncpy(new_child_node->data, (ptr + store_length),
                 new_child_node->len);
         new_child_node->data[new_child_node->len] = '\0';
+        new_child_node->data =
+            clean_escaped_characters(new_child_node->data, new_child_node->len);
+        new_child_node->len = strlen(new_child_node->data);
         append_to_root(new_last_child, new_child_node);
         ptr = matching + store_length - 1;
 
         start = matching + store_length;
         break;
+
       case '[':
         matching = identify_char(ptr, text, text_length, ']');
         if (matching == NULL) {
@@ -226,6 +252,9 @@ void parse_new_paragraph_line(md_node *paragraph_node) {
             (char *)calloc(new_link_node->url_length, sizeof(char));
         strncpy(new_link_node->url, (matching + 2), new_link_node->url_length);
         new_link_node->url[new_link_node->url_length] = '\0';
+        new_link_node->url = clean_escaped_characters(
+            new_link_node->url, new_link_node->url_length);
+        new_link_node->url_length = strlen(new_link_node->url);
 
         // set the alternate text
         new_child_node =
@@ -236,6 +265,9 @@ void parse_new_paragraph_line(md_node *paragraph_node) {
             (char *)calloc(new_child_node->len + 1, sizeof(char));
         strncpy(new_child_node->data, (ptr + 1), new_child_node->len);
         new_child_node->data[new_child_node->len] = '\0';
+        new_child_node->data =
+            clean_escaped_characters(new_child_node->data, new_child_node->len);
+        new_child_node->len = strlen(new_child_node->data);
         append_to_root(new_link_node, new_child_node);
 
         start = close_paren + 1;
@@ -246,7 +278,6 @@ void parse_new_paragraph_line(md_node *paragraph_node) {
     }
     ptr++;
   }
-  printf("done identify\n");
 
   // we need to create a text node to put whatever is left
   end = text + text_length;
