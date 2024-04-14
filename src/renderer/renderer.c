@@ -137,7 +137,6 @@ void convert_emph(md_node *node, FILE *output, int entering) {
 void convert_heading(md_node *node, FILE *output, int entering) {
   int level;
 
-  fprintf(output, entering ? "\\emph{" : "}");
   level = md_node_get_heading_level(node);
   switch (level) {
     case 1:
