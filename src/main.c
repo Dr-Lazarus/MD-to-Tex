@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
     free(outputFileName);
     return 1;
   }
+  printf("Parsing Completed!\n");
 
   FILE *output = fopen(outputFileName, "w");
   if (!output) {
@@ -123,6 +124,9 @@ int main(int argc, char **argv) {
   }
 
   fprintf(output, "\\documentclass{article}\n");
+  fprintf(output, "\\usepackage{amssymb}\n");
+  fprintf(output, "\\usepackage{amsmath}\n");
+  fprintf(output, "\\usepackage{graphicx}\n");
   fprintf(output, "\\usepackage{tikz}\n");
   fprintf(output, "\\usepackage{pgf-pie}\n");
   fprintf(output, "\\usepackage{pgf-umlsd}\n");
