@@ -151,9 +151,7 @@ void parse_line(md_node *root, const char *line, int line_length,
   } else if (current_line_type == LINE_EMPTY) {
 
     // helps terminate the previous paragraph if necessary
-    if (prev_node != NULL &&
-        (prev_node->type == NODE_PARAGRAPH || prev_node->type == NODE_LIST) &&
-        prev_node->user_data == MODE_APPEND) {
+    if (prev_node != NULL && prev_node->user_data == MODE_APPEND) {
       prev_node->user_data = MODE_PROCESSED;
     }
 
@@ -164,6 +162,9 @@ void parse_line(md_node *root, const char *line, int line_length,
     if (prev_node == NULL || !(prev_node->type == NODE_PARAGRAPH &&
                                prev_node->user_data == MODE_APPEND)) {
 
+      if (prev_node != NULL) {
+        prev_node->user_data = MODE_PROCESSED;
+      }
       new_child_node =
           create_md_node(NODE_PARAGRAPH, line_number, line_number, -1, -1);
       append_to_root(root, new_child_node);
