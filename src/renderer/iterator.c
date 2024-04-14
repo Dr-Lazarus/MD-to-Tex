@@ -1,6 +1,8 @@
 #include "iterator.h"
 
-int is_leaf(md_node *node) { return node->first_child == NULL; }
+int is_leaf(md_node *node) {
+  return node->first_child == NULL;
+}
 
 md_iter *md_iter_new(md_node *root) {
   if (root == NULL) {
@@ -47,8 +49,6 @@ iter_event_type md_iter_next(md_iter *iter) {
     iter->next.event_type = EVENT_EXIT;
     iter->next.node = node->parent;
   } else {
-    // idk what this is for
-    // assert(false);
     iter->next.event_type = EVENT_DONE;
     iter->next.node = NULL;
   }
@@ -56,4 +56,6 @@ iter_event_type md_iter_next(md_iter *iter) {
   return event_type;
 }
 
-md_node *md_iter_get_node(md_iter *iter) { return iter->current.node; }
+md_node *md_iter_get_node(md_iter *iter) {
+  return iter->current.node;
+}

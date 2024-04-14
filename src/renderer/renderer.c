@@ -71,20 +71,11 @@ void traverse_ast(md_node *root, FILE *output) {
       case NODE_STRONG:
         convert_strong(node, output, entering);
         break;
-      case NODE_SOFTBREAK:
-        convert_softbreak(node, output, entering);
-        break;
-      case NODE_LINEBREAK:
-        convert_linebreak(node, output, entering);
-        break;
       case NODE_LINK:
         convert_link(node, output, entering);
         break;
       case NODE_IMAGE:
         convert_image(node, output, entering);
-        break;
-      case NODE_MERMAID_DIAGRAM:
-        convert_mermaid_diagram(node, output, entering);
         break;
       default:
         break;
@@ -120,6 +111,9 @@ void convert_text(md_node *node, FILE *output, int entering) {
         case '}':
           fprintf(output, "\\}");
           break;
+        case '%':
+          fprintf(output, "\\%%");
+          break;
         case '$':
           fprintf(output, "\\$");
           break;
@@ -146,7 +140,6 @@ void convert_emph(md_node *node, FILE *output, int entering) {
 void convert_heading(md_node *node, FILE *output, int entering) {
   int level;
 
-  fprintf(output, entering ? "\\emph{" : "}");
   level = md_node_get_heading_level(node);
   switch (level) {
     case 1:
@@ -243,21 +236,6 @@ void convert_math(md_node *node, FILE *output, int entering) {
 }
 
 /*
- * Converts a softbreak node into a space in LaTeX. Softbreaks represent
- * spaces or soft line breaks in the source markdown.
- */
-void convert_softbreak(md_node *node, FILE *output, int entering) {
-  fprintf(output, " ");
-}
-
-/*
- * Converts a linebreak node into a forced newline in LaTeX using the newline command.
- */
-void convert_linebreak(md_node *node, FILE *output, int entering) {
-  fprintf(output, "\\newline\n");
-}
-
-/*
  * Converts a link node into LaTeX hyperref format, making the link clickable.
  */
 void convert_link(md_node *node, FILE *output, int entering) {
@@ -350,15 +328,9 @@ void convert_graph_diagram(const char *mermaid_code, FILE *output) {
   char node_list[MAX_NODES] = {0};
   Edge edge_list[MAX_EDGES];
   int edge_count = 0;
-  int i;
   Position positions[MAX_NODES];
 
   parse_graph_mermaid_code(mermaid_code, node_list, edge_list, &edge_count);
-
-  printf("Node List: %s\n", node_list);
-  for (i = 0; i < edge_count; i++) {
-    printf("Edge: %c -> %c\n", edge_list[i].fromNode, edge_list[i].toNode);
-  }
 
   calculate_layout(node_list, edge_list, edge_count, positions);
   generate_latex_graph(node_list, positions, edge_list, edge_count, output);

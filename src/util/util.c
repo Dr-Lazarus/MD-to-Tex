@@ -79,3 +79,22 @@ void collate_children_text(md_node *node) {
 //     text_node->len += (line_length + 1);
 //   }
 // }
+
+char *clean_escaped_characters(char *text, int text_length) {
+  char *result = (char *)calloc(text_length + 1, sizeof(char));
+  int i, j;
+
+  for (i = 0, j = 0; i < text_length; i++) {
+    if (i < text_length - 1 && text[i] == '\\') {
+      result[j] = text[i + 1];
+      i++;
+    } else {
+      result[j] = text[i];
+    }
+    j++;
+  }
+  result[j] = '\0';
+  result = (char *)realloc(result, (j + 1) * sizeof(char));
+
+  return result;
+}
