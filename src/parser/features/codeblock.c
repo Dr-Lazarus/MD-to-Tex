@@ -25,7 +25,6 @@ void set_code_language(md_node *current_node, const char *line,
 
   current_node->code_language = (char *)calloc(line_length - 2, sizeof(char));
   line += 3;
-  printf("%s\n", line);
   strncpy(current_node->code_language, line, line_length - 2);
 }
 

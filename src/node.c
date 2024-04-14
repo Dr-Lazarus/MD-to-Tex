@@ -51,9 +51,6 @@ void print_type(md_node *node, int indent_level) {
     case NODE_CODE_BLOCK:
       printf("code node\n");
       break;
-    case NODE_MERMAID_DIAGRAM:
-      printf("mermaid node\n");
-      break;
     case NODE_IMAGE:
       printf("image node\n");
       break;
@@ -103,9 +100,6 @@ char *print_node_type(NodeType type) {
     case NODE_BLOCK_QUOTE:
       return "NODE_BLOCK_QUOTE";
       break;
-    case NODE_BREAK:
-      return "NODE_BREAK";
-      break;
     case NODE_CODE:
       return "NODE_CODE";
       break;
@@ -117,9 +111,6 @@ char *print_node_type(NodeType type) {
       break;
     case NODE_MATH_BLOCK:
       return "NODE_MATH_BLOCK";
-      break;
-    case NODE_DEFINITION:
-      return "NODE_DEFINITION";
       break;
     case NODE_EMPH:
       return "NODE_EMPH";
@@ -133,17 +124,8 @@ char *print_node_type(NodeType type) {
     case NODE_IMAGE:
       return "NODE_IMAGE";
       break;
-    case NODE_IMAGEREFERENCE:
-      return "NODE_IMAGEREFERENCE";
-      break;
-    case NODE_INLINECODE:
-      return "NODE_INLINECODE";
-      break;
     case NODE_LINK:
       return "NODE_LINK";
-      break;
-    case NODE_LINKREFERENCE:
-      return "NODE_LINKREFERENCE";
       break;
     case NODE_LIST:
       return "NODE_LIST";
@@ -162,18 +144,6 @@ char *print_node_type(NodeType type) {
       break;
     case NODE_TEXT:
       return "NODE_TEXT";
-      break;
-    case NODE_THEMATICBREAK:
-      return "NODE_THEMATICBREAK";
-      break;
-    case NODE_SOFTBREAK:
-      return "NODE_SOFTBREAK";
-      break;
-    case NODE_LINEBREAK:
-      return "NODE_LINEBREAK";
-      break;
-    case NODE_MERMAID_DIAGRAM:
-      return "NODE_MERMAID_DIAGRAM";
       break;
     default:
       return "unknown";

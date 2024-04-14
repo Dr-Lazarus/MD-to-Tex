@@ -7,7 +7,8 @@ void set_text_data(md_node *node, const char *text, int text_length,
                    int line_number) {
   node->data = (char *)calloc(text_length + 1, sizeof(char));
   node->len = text_length;
-  strncpy(node->data, text, text_length + 1);
+  strncpy(node->data, text, text_length);
+  node->data[node->len] = '\0';
 }
 
 char *identify_special_char(char *ptr, char *text, int text_length) {

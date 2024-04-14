@@ -99,7 +99,6 @@ void parse_line(md_node *root, const char *line, int line_length,
         (prev_node->type == NODE_MATH_BLOCK &&
          current_line_type == LINE_MATH_DELIM)) {
       // we terminate the current prev_node
-      printf("ending block\n");
       collate_children_text(prev_node);
       prev_node->end_line = line_number;
       prev_node->user_data = MODE_PROCESSED;
