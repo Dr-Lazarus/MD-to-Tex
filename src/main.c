@@ -9,7 +9,7 @@
 #include "parser/parser.h"
 #include "renderer/renderer.h"
 
-void printHelp() {
+void printHelp(void) {
   printf("Usage: md_2_tex -i <inputfile> [-o <outputfile.tex>]\n");
   printf(
       "Convert Markdown files to LaTeX format by parsing the Markdown into an "
@@ -126,6 +126,7 @@ int main(int argc, char **argv) {
   fprintf(output, "\\usepackage{tikz}\n");
   fprintf(output, "\\usepackage{pgf-pie}\n");
   fprintf(output, "\\usepackage{pgf-umlsd}\n");
+  fprintf(output, "\\usepackage{tikz-uml}\n");
   fprintf(output, "\\begin{document}\n");
   traverse_ast(document, output);
   fprintf(output, "\\end{document}\n");
