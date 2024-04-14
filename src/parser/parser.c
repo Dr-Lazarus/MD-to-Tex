@@ -134,6 +134,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     new_child_node->user_data = MODE_PROCESSED;
     set_header_data(new_child_node, line, line_length);
     append_to_root(root, new_child_node);
+    parse_new_paragraph_line(root->last_child);
 
   } else if (current_line_type == LINE_IMAGE) {
 
@@ -371,6 +372,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     new_child_node->data[new_child_node->len] = '\0';
     append_to_root(prev_node, new_child_node);
 
+    parse_new_paragraph_line(prev_node);
     // now that we have checked through all the requirements,
   } else {
     printf("Line %d: Ignoring line %s, unknown\n", line_number,

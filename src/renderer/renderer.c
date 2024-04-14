@@ -111,6 +111,9 @@ void convert_text(md_node *node, FILE *output, int entering) {
         case '}':
           fprintf(output, "\\}");
           break;
+        case '%':
+          fprintf(output, "\\%%");
+          break;
         case '$':
           fprintf(output, "\\$");
           break;

@@ -15,7 +15,8 @@ char *identify_special_char(char *ptr, char *text, int text_length) {
   int i;
   for (i = ptr - text; i < text_length; i++) {
     if (ptr[0] == '\\') {
-      ptr += 2;
+      ptr++;
+      i++;
     } else if (ptr[0] == '*' || ptr[0] == '_' || ptr[0] == '[' ||
                ptr[0] == '$' || ptr[0] == '`') {
       return ptr;
@@ -30,7 +31,8 @@ char *identify_special_str(char *ptr, char *text, int text_length, char *target,
   int i;
   for (i = ptr - text; i < text_length; i++) {
     if (ptr[0] == '\\') {
-      ptr += 2;
+      ptr++;
+      i++;
     } else if (ptr[0] == target[0]) {
       if (i + target_length - 1 < text_length &&
           strncmp(ptr, target, target_length) == 0) {
@@ -47,6 +49,7 @@ char *identify_char(char *ptr, char *text, int text_length, char target) {
   for (i = ptr - text; i < text_length; i++) {
     if (ptr[0] == '\\') {
       ptr++;
+      i++;
     } else if (ptr[0] == target) {
       return ptr;
     }
