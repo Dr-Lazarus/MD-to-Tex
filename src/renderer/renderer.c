@@ -328,15 +328,9 @@ void convert_graph_diagram(const char *mermaid_code, FILE *output) {
   char node_list[MAX_NODES] = {0};
   Edge edge_list[MAX_EDGES];
   int edge_count = 0;
-  // int i;
   Position positions[MAX_NODES];
 
   parse_graph_mermaid_code(mermaid_code, node_list, edge_list, &edge_count);
-
-  // printf("Node List: %s\n", node_list);
-  // for (i = 0; i < edge_count; i++) {
-  //   printf("Edge: %c -> %c\n", edge_list[i].fromNode, edge_list[i].toNode);
-  // }
 
   calculate_layout(node_list, edge_list, edge_count, positions);
   generate_latex_graph(node_list, positions, edge_list, edge_count, output);

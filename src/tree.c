@@ -73,7 +73,7 @@ void free_tree(md_node *root) {
     return;
   }
 
-  // if there are children
+  /* if there are children */
   if (root->first_child != NULL) {
     for (md_node *child = root->first_child; child != NULL;
          child = child->next) {

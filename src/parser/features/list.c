@@ -5,9 +5,8 @@
 int is_list_item(const char *line, int line_length) {
   regex_t list_regex;
   int value;
-  // Creation of regEx
-  // we are opinionated and need the space
-  value = regcomp(&list_regex, "^(\t| )*(\\*|-|\\+)(\t| )(.*)$", REG_EXTENDED);
+  /* Creation of regEx */
+  value = regcomp(&list_regex, "^( )*(\\*|-|\\+)( )(.*)$", REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
   }
@@ -17,8 +16,7 @@ int is_list_item(const char *line, int line_length) {
   }
 
   // check numbered list
-  value = regcomp(&list_regex, "^(\t| )*([[:digit:]]+\\.)(\t| )(.*)$",
-                  REG_EXTENDED);
+  value = regcomp(&list_regex, "^( )*([[:digit:]]+\\.)( )(.*)$", REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
   }

@@ -25,7 +25,7 @@ convert_to_tex() {
 	input_file="$1"
 	output_file="${output_dir}/$(basename "${input_file%.*}").tex"
 	echo "Converting $input_file to $output_file"
-	./md_to_tex -i "$input_file" -o "test_folder/output$output_file" -d
+	./md_to_tex -i "$input_file" -o "test_folder/output$output_file"
 }
 
 export -f convert_to_tex

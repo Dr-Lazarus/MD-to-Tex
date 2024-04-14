@@ -15,7 +15,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-// first we need some code to read the file
+/* first we need some code to read the file 
+ * This code was taken from class work*/
+
 char *read_source_code(const char *filename) {
   FILE *file = fopen(filename, "r");
   if (file == NULL) {
@@ -73,14 +75,14 @@ void parse_line(md_node *root, const char *line, int line_length,
   char char_delim;
   int delimiter_length;
   int initial;
-  // we get the line type first
+  /* we get the line type first */
   current_line_type = get_line_type(line, line_length);
 
-  // now we want to figure out how it fits in the Tree
-  // First we check what the last node is
+  /* now we want to figure out how it fits in the Tree */
+  /* First we check what the last node is */
   prev_node = root->last_child;
 
-  // Now we want to figure out how does this line fit in the Tree
+  /* Now we want to figure out how does this line fit in the Tree */
   if (debugging) {
     printf("parsing line: %d, type: %s, prev node: %s\n", line_number,
            print_line_type(current_line_type),
@@ -93,12 +95,12 @@ void parse_line(md_node *root, const char *line, int line_length,
        prev_node->type == NODE_MATH_BLOCK) &&
       prev_node->user_data == MODE_APPEND) {
 
-    // if the line is a delimiter
+    /* if the line is a delimiter */
     if ((prev_node->type == NODE_CODE_BLOCK &&
          current_line_type == LINE_CODE_DELIM) ||
         (prev_node->type == NODE_MATH_BLOCK &&
          current_line_type == LINE_MATH_DELIM)) {
-      // we terminate the current prev_node
+      /* we terminate the current prev_node */
       collate_children_text(prev_node);
       prev_node->end_line = line_number;
       prev_node->user_data = MODE_PROCESSED;
@@ -112,8 +114,8 @@ void parse_line(md_node *root, const char *line, int line_length,
   } else if (current_line_type == LINE_CODE_DELIM ||
              current_line_type == LINE_MATH_DELIM) {
 
-    // so if the previous node is not in append mode, we should jump here
-    // and create the new code block
+    /* so if the previous node is not in append mode, we should jump here */
+    /* and create the new code block */
     new_child_node =
         create_md_node(current_line_type == LINE_CODE_DELIM ? NODE_CODE_BLOCK
                                                             : NODE_MATH_BLOCK,
@@ -122,9 +124,9 @@ void parse_line(md_node *root, const char *line, int line_length,
     append_to_root(root, new_child_node);
 
   } else if (current_line_type == LINE_HEADER) {
-    // if it is a header
-    // it doesn't matter what the last node is
-    // we will just mark previous node as processed.
+    /* if it is a header */
+    /* it doesn't matter what the last node is */
+    /* we will just mark previous node as processed. */
     if (prev_node != NULL) {
       prev_node->user_data = MODE_PROCESSED;
     }
@@ -151,15 +153,15 @@ void parse_line(md_node *root, const char *line, int line_length,
 
   } else if (current_line_type == LINE_EMPTY) {
 
-    // helps terminate the previous paragraph if necessary
+    /* helps terminate the previous paragraph if necessary */
     if (prev_node != NULL && prev_node->user_data == MODE_APPEND) {
       prev_node->user_data = MODE_PROCESSED;
     }
 
   } else if (current_line_type == LINE_TEXT) {
 
-    // if previous node is not a appending paragraph,
-    // we need to create a new appending paragraph
+    /* if previous node is not a appending paragraph, */
+    /* we need to create a new appending paragraph */
     if (prev_node == NULL || !(prev_node->type == NODE_PARAGRAPH &&
                                prev_node->user_data == MODE_APPEND)) {
 
@@ -169,17 +171,17 @@ void parse_line(md_node *root, const char *line, int line_length,
       new_child_node =
           create_md_node(NODE_PARAGRAPH, line_number, line_number, -1, -1);
       append_to_root(root, new_child_node);
-      // make the new paragraph node the prev_node
+      /* make the new paragraph node the prev_node */
       prev_node = new_child_node;
     }
-    // create a new paragraph and then set it to mode append
-    // we will append new stuff
+    /* create a new paragraph and then set it to mode append */
+    /* we will append new stuff */
     prev_node->end_line = line_number;
     new_child_node =
         create_md_node(NODE_TEXT, line_number, line_number, 0, line_length);
     set_text_data(new_child_node, line, line_length, line_number);
-    // check if we need add an extra space in front of the text data
-    // if there is another text node then we need to add a space infront
+    /* check if we need add an extra space in front of the text data */
+    /* if there is another text node then we need to add a space infront */
     if (prev_node->last_child != NULL) {
       add_space_infront(new_child_node);
     }
@@ -194,7 +196,7 @@ void parse_line(md_node *root, const char *line, int line_length,
       new_child_node =
           create_md_node(NODE_BLOCK_QUOTE, line_number, line_number, -1, -1);
       append_to_root(root, new_child_node);
-      // make the new paragraph node the prev_node
+      /* make the new paragraph node the prev_node */
       prev_node = new_child_node;
     }
 
@@ -204,13 +206,13 @@ void parse_line(md_node *root, const char *line, int line_length,
 
   } else if (current_line_type == LINE_LISTITEM) {
 
-    // check indentation level
+    /* check indentation level */
     for (indent = 0; indent < line_length; indent++) {
       if (line[indent] != ' ') {
         break;
       }
     }
-    // check if indent is correct
+    /* check if indent is correct */
     if (indent % INDENT_SPACE != 0) {
       printf(
           "Line %d: Inconsistent indentation with %d. Supposed to only be "
@@ -219,9 +221,9 @@ void parse_line(md_node *root, const char *line, int line_length,
       exit(EXIT_FAILURE);
     }
 
-    // if the last child was not a list
-    // we add if indent == 0
-    // otherwise we throw an error
+    /* if the last child was not a list */
+    /* we add if indent == 0 */
+    /* otherwise we throw an error */
     if (prev_node != NULL && prev_node->type != NODE_LIST && indent != 0) {
       printf("Line %d: Not allowed to have nested list declared immediately\n",
              line_number);
@@ -230,8 +232,8 @@ void parse_line(md_node *root, const char *line, int line_length,
 
     nested = indent / INDENT_SPACE;
 
-    // we go n - 1 for the depth.
-    // so if its 1 nested, we try to go from root down once
+    /* we go n - 1 for the depth. */
+    /* so if its 1 nested, we try to go from root down once */
 
     list_child = root;
     for (i = 0; i < nested; i++) {
@@ -246,9 +248,9 @@ void parse_line(md_node *root, const char *line, int line_length,
         exit(EXIT_FAILURE);
       }
     }
-    // now we create the list node if the last node was not list
-    // we should also create if the previous list is in MODE_PROCESSED
-    // identify the type of list item first
+    /* now we create the list node if the last node was not list */
+    /* we should also create if the previous list is in MODE_PROCESSED */
+    /* identify the type of list item first */
     if (line[indent] >= '0' && line[indent] <= '9') {
       list_type = LIST_NUMBERED;
     } else {
@@ -261,7 +263,7 @@ void parse_line(md_node *root, const char *line, int line_length,
          list_child->last_child->user_data == MODE_PROCESSED)) {
       new_child_node = create_md_node(NODE_LIST, line_number, line_number, 0,
                                       line_length - 1);
-      // we also identify what kind of list is it
+      /* we also identify what kind of list is it */
       new_child_node->list_type = list_type;
 
       append_to_root(list_child, new_child_node);
@@ -270,10 +272,10 @@ void parse_line(md_node *root, const char *line, int line_length,
       prev_node = list_child->last_child;
     }
 
-    // we should check all the other conditions for delimiter information
+    /* we should check all the other conditions for delimiter information */
 
-    // now we create the node itself with the data
-    // we check for when we reach the next space
+    /* now we create the node itself with the data */
+    /* we check for when we reach the next space */
     delimiter = (char *)calloc(line_length, sizeof(char));
     delimiter_length = 0;
     for (initial = indent; indent < line_length; indent++) {
@@ -285,8 +287,8 @@ void parse_line(md_node *root, const char *line, int line_length,
       delimiter_length++;
     }
     delimiter[delimiter_length] = '\0';
-    // we should do all the checks
-    // first, we identify if the delimiter is correct
+    /* we should do all the checks */
+    /* first, we identify if the delimiter is correct */
     if (prev_node->last_child != NULL) {
       prev_list_item = prev_node->last_child;
       while (prev_list_item != NULL && prev_list_item->type != NODE_ITEM) {
@@ -296,25 +298,25 @@ void parse_line(md_node *root, const char *line, int line_length,
       prev_list_item = NULL;
     }
 
-    // now we need to check the delimiter
-    // First we create it
+    /* now we need to check the delimiter */
+    /* First we create it */
     if (list_type == LIST_NUMBERED) {
       number_delim = (char *)calloc(delimiter_length, sizeof(char));
       strncpy(number_delim, delimiter, delimiter_length - 1);
       number_delim[delimiter_length - 1] = '\0';
       list_number_delim = atoi(number_delim);
-      // this is in case;
+      /* this is in case; */
       char_delim = ' ';
     } else if (list_type == LIST_BULLET) {
       char_delim = delimiter[0];
-      // in case
+      /* in case */
       list_number_delim = 0;
     } else {
       char_delim = ' ';
       list_number_delim = 0;
     }
 
-    // if the list types are not different
+    /* if the list types are not different */
     if (list_type != prev_node->list_type) {
       printf(
           "Line %d: Do not mix list types together new line is %s while list "
@@ -323,9 +325,9 @@ void parse_line(md_node *root, const char *line, int line_length,
           prev_node->list_type == LIST_NUMBERED ? "Numbered" : "Bullet");
 
     } else {
-      // check for consistency
+      /* check for consistency */
       if (prev_list_item != NULL) {
-        // now we need to check the delimiter;
+        /* now we need to check the delimiter; */
         if (prev_node->list_type == LIST_BULLET) {
 
           if (prev_list_item->delimiter != char_delim) {
@@ -352,12 +354,12 @@ void parse_line(md_node *root, const char *line, int line_length,
       }
     }
 
-    // we then ignore the space
+    /* we then ignore the space */
     indent++;
 
     new_child_node = create_md_node(NODE_ITEM, line_number, line_number, indent,
                                     line_length - 1);
-    // potentially messed up right now if the list type not compatible but it will be safe
+    /* potentially messed up right now if the list type not compatible but it will be safe */
     new_child_node->list_number = list_number_delim;
     new_child_node->delimiter = char_delim;
 
@@ -373,7 +375,7 @@ void parse_line(md_node *root, const char *line, int line_length,
     append_to_root(prev_node, new_child_node);
 
     parse_new_paragraph_line(prev_node);
-    // now that we have checked through all the requirements,
+    /* now that we have checked through all the requirements, */
   } else {
     printf("Line %d: Ignoring line %s, unknown\n", line_number,
            print_line_type(current_line_type));
@@ -396,7 +398,7 @@ md_node *parse_source(char *file_name, int debugging) {
 
   while ((ptr = strstr(ptr, "\n")) != NULL) {
     line_length = ptr - start;
-    // perform realloc if not sufficient length
+    /* perform realloc if not sufficient length */
     if (line_size < line_length) {
       while (line_size < line_length) {
         line_size *= 2;
@@ -408,14 +410,14 @@ md_node *parse_source(char *file_name, int debugging) {
     line[line_length] = '\0';
 
     parse_line(root, line, line_length, line_number, debugging);
-    // terminating stuff
+    /* terminating stuff */
     line_number++;
     char_so_far += (line_length + 1);
     line_length = 0;
     ptr++;
     start = ptr;
   }
-  // last line needs to be considered also
+  /* last line needs to be considered also */
   line_length = strlen(file_contents) - char_so_far;
   if (line_size < line_length) {
     while (line_size < line_length) {
@@ -435,5 +437,3 @@ md_node *parse_source(char *file_name, int debugging) {
   free(line);
   return root;
 }
-// possible reference for line reading
-// https://stackoverflow.com/questions/29576799/reading-an-unknown-length-line-from-stdin-in-c-with-fgets

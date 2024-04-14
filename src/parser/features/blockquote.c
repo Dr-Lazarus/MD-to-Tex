@@ -6,7 +6,7 @@
 int is_blockquote(const char *line, int line_length) {
   regex_t regex;
   int value;
-  // Creation of regEx
+  /* Creation of regEx */
   value = regcomp(&regex, "^>+.*", REG_EXTENDED);
   if (value != 0) {
     printf("regex didn't compile\n");
