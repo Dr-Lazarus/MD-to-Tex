@@ -5,25 +5,35 @@
 ## Overview
 This project is a Markdown to LaTeX converter written in C. It parses a Markdown (.md) file, constructs an abstract syntax tree (AST) representing the structured content of the document, and then renders that AST to a LaTeX (.tex) file.
 
-## Compilation
+## Installation
 
-The project includes a `Makefile` for easy compilation. Use the following command to compile the project:
+To install and compile the MD-to-Tex project, use the following command in the terminal:
 
-```
+```bash
 make
 ```
 
-This will generate the `md_to_tex` executable within the project directory.
+This will generate the necessary executable to convert Markdown to LaTeX.
+
+## Running Tests
+
+To run predefined tests and view outputs, execute the included test script:
+
+```bash
+./testing.sh
+```
+
+After running the script, check the `output` directory to review the results of all test cases.
 
 ## Usage
 
-To convert a Markdown file to LaTeX, run:
+To convert an individual Markdown file to a LaTeX document, first compile the project using `make`, then run the following command:
 
-```
-./md_to_tex <md_file>
+```bash
+./md_to_tex -i <input_file_name> -o <output_file_name> 
 ```
 
-The LaTeX output will be written to `output.tex` in the current directory.
+Replace `<input_file_name>` with the path to your Markdown file. The output will be a `.tex` file with the same name as the input file, located in the current directory.
 
 ## Structure
 
@@ -33,6 +43,12 @@ The LaTeX output will be written to `output.tex` in the current directory.
     - `parser.c`: Main parser file that orchestrates the parsing process.
   - `renderer`: Responsible for rendering the AST to LaTeX format.
     - `renderer.c`: Main renderer file that traverses the AST and generates LaTeX.
+    - `iterator.c`: Iterator tracks traversal to correctly render LaTeX syntax for Markdown elements, ensuring proper structure.
+    - `features`
+         - `mermaid_graph.c`: Responsible for rendering graph diagrams in LaTEX.
+         - `memraid_class_diagram.c`: Responsible for rendering xlass diagrams in LaTEX.
+         - `mermaid_pie.c`: Responsible for rendering pi charts in LaTEX.
+         - `mermaid_seq_diagram.c `: Responsible for rendering seqeuence diagrams in LaTEX.
   - `util`: Utility files for common operations.
     - `node.c`: Handles node operations within the AST.
     - `tree.c`: Functions for managing the AST including initialization and cleanup.
@@ -45,6 +61,7 @@ The LaTeX output will be written to `output.tex` in the current directory.
 - `md_to_tex`: Executable generated after compilation.
 
 - `output.tex`: The resulting LaTeX file after conversion.
+
 ## Detailed Functionality
 
 ### `main.c`
@@ -71,16 +88,26 @@ The LaTeX output will be written to `output.tex` in the current directory.
 ### `iterator.c`
 - Offers an iterator pattern to facilitate AST traversal without recursion.
 
-### `node.c`, `codeblock.c`, `headers.c`, `paragraph.c`
+### `node.c`, `codeblock.c`, `headers.c`, `paragraph.c`, `blockquote.c`, `image.c`, `list.c`, `mathblock.c`
 - Define structures and functions for node management specific to various Markdown elements.
-- Detect Markdown syntax for code blocks, headers, and paragraphs, and configure nodes with the relevant data.
+- Detect Markdown syntax for code blocks, headers, paragraphs, blockquote, image, list, mathblock, mermaid diagrams and configure nodes with the relevant data.
+
+### `mermaid_class_diagram.c`, `mermaid_sequence_diagram.c`, `mermaid_graph.c`, `mermaid_pie.c`
+- These modules handle the parsing and rendering of various Mermaid diagram types (class diagrams, sequence diagrams, graphs, and pie charts) from Markdown to LaTeX format.
 
 ## Features
 
 - Parsing of Markdown syntax into an AST.
 - Rendering of the AST to LaTeX format.
-- Supports diagrams, headers, paragraphs, code blocks, and other Markdown elements.
+- Supports diagrams (graphs, sequence diagrams, pie charts, class diagrams), headers, paragraphs, code blocks, and other Markdown elements.
 
-## Dependencies
+## Compatibility
 
-- Standard C libraries only.
+Tested on macOS, Linux, and Windows environments by our team, ensuring cross-platform reliability.
+
+## Authors
+
+- Yong Zhe Rui Gabriel
+- Visshal Natarjan
+- Kaveri Priya Putti
+- Aurelius Bryan Yuwana
