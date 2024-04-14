@@ -6,9 +6,6 @@ This is an example of a top-level header, equivalent to an `<h1>` tag in HTML.
 
 Below is an example of how to embed an image in Markdown:
 
-<!--
-![/Users/visshal/Repositories/MD-to-Tex/IMG_0311[61020].jpeg](path_to_image.jpg) -->
-
 ## List Example
 
 Here is an example of a bulleted list:
